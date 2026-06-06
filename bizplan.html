@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TrustMatch 事業企画書</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --navy:#0B2B5A; --gold:#E8A020; --green:#059669;
+      --gray-1:#111827; --gray-2:#374151; --gray-3:#6B7280; --gray-4:#E5E7EB; --gray-5:#F9FAFB;
+      --blue:#2563EB;
+    }
+    body { font-family:'Hiragino Sans','Noto Sans JP',Arial,sans-serif; color:var(--gray-1); background:#fff; line-height:1.7; font-size:15px; }
+
+    /* Cover */
+    .cover { min-height:100vh; background:linear-gradient(150deg,var(--navy) 0%,#1A3A6B 60%,#0B2B5A 100%); display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; padding:60px 5vw; page-break-after:always; }
+    .cover-badge { background:rgba(232,160,32,.18); color:var(--gold); border:1px solid rgba(232,160,32,.35); padding:6px 22px; border-radius:100px; font-size:.82rem; font-weight:700; margin-bottom:32px; display:inline-block; }
+    .cover h1 { font-size:clamp(2.2rem,5vw,3.6rem); font-weight:900; color:#fff; line-height:1.2; margin-bottom:16px; }
+    .cover h1 span { color:var(--gold); }
+    .cover .cover-sub { font-size:1.05rem; color:rgba(255,255,255,.7); max-width:560px; margin:0 auto 48px; }
+    .cover-meta { display:flex; gap:32px; flex-wrap:wrap; justify-content:center; }
+    .cover-meta-item { color:rgba(255,255,255,.55); font-size:.82rem; }
+    .cover-meta-item strong { color:rgba(255,255,255,.9); display:block; font-size:1rem; }
+
+    /* Layout */
+    .page { max-width:860px; margin:0 auto; padding:64px 5vw; }
+    .page + .page { border-top:2px solid var(--gray-4); }
+
+    /* Headings */
+    .chapter { display:flex; align-items:center; gap:14px; margin-bottom:36px; padding-bottom:16px; border-bottom:2px solid var(--navy); }
+    .chapter-num { width:44px; height:44px; border-radius:50%; background:var(--navy); color:#fff; font-weight:900; font-size:.95rem; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .chapter h2 { font-size:1.5rem; font-weight:900; color:var(--navy); }
+    h3 { font-size:1.05rem; font-weight:800; color:var(--navy); margin:28px 0 12px; padding-left:12px; border-left:4px solid var(--gold); }
+    h4 { font-size:.9rem; font-weight:800; color:var(--gray-2); margin:18px 0 8px; }
+    p { color:var(--gray-2); margin-bottom:12px; }
+
+    /* Callout box */
+    .callout { background:var(--gray-5); border-radius:10px; padding:20px 24px; margin:20px 0; border-left:4px solid var(--navy); }
+    .callout.gold { border-left-color:var(--gold); background:#FFFBF0; }
+    .callout.green { border-left-color:var(--green); background:#F0FDF9; }
+    .callout.red { border-left-color:#DC2626; background:#FEF2F2; }
+    .callout-label { font-size:.72rem; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--gray-3); margin-bottom:6px; }
+    .callout.gold .callout-label { color:#92630A; }
+    .callout.green .callout-label { color:#065F46; }
+    .callout.red .callout-label { color:#991B1B; }
+    .callout p { margin-bottom:0; font-size:.9rem; }
+    .callout strong { color:var(--navy); }
+
+    /* Table */
+    table { width:100%; border-collapse:collapse; margin:20px 0; font-size:.875rem; }
+    th { background:var(--navy); color:#fff; padding:10px 14px; text-align:left; font-weight:700; }
+    td { padding:10px 14px; border-bottom:1px solid var(--gray-4); color:var(--gray-2); vertical-align:top; }
+    tr:nth-child(even) td { background:var(--gray-5); }
+    .td-hl { font-weight:700; color:var(--navy); }
+    .td-gold { font-weight:700; color:#92630A; }
+    .td-green { font-weight:700; color:#065F46; }
+    .td-red { font-weight:700; color:#991B1B; }
+
+    /* Cards */
+    .card-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; margin:20px 0; }
+    .card { background:#fff; border:1.5px solid var(--gray-4); border-radius:10px; padding:20px; }
+    .card-icon { font-size:1.8rem; margin-bottom:10px; }
+    .card h4 { font-size:.88rem; font-weight:800; color:var(--navy); margin:0 0 6px; padding:0; border:none; }
+    .card p { font-size:.8rem; color:var(--gray-3); margin:0; }
+    .card.highlight { border-color:var(--gold); background:#FFFBF0; }
+    .card.highlight h4 { color:#92630A; }
+
+    /* Score visual */
+    .score-demo { display:grid; grid-template-columns:1fr auto 1fr; gap:20px; align-items:center; margin:20px 0; }
+    @media(max-width:560px){ .score-demo{grid-template-columns:1fr;} .score-plus{display:none;} }
+    .score-box { border-radius:10px; padding:20px; text-align:center; }
+    .score-box.sb-gold { background:#FFFBF0; border:1.5px solid rgba(232,160,32,.3); }
+    .score-box.sb-green { background:#F0FDF9; border:1.5px solid rgba(5,150,105,.25); }
+    .score-box .sb-icon { font-size:1.8rem; margin-bottom:8px; }
+    .score-box h4 { font-size:.82rem; font-weight:800; margin:0 0 6px; padding:0; border:none; }
+    .score-box.sb-gold h4 { color:#92630A; }
+    .score-box.sb-green h4 { color:#065F46; }
+    .score-box p { font-size:.78rem; color:var(--gray-3); margin:0; }
+    .score-plus { font-size:2rem; font-weight:900; color:var(--gray-4); text-align:center; }
+
+    /* Lean Canvas */
+    .lc-grid { display:grid; grid-template-columns:1fr 1fr 1fr 1fr 1fr; grid-template-rows:auto auto; border:2px solid var(--navy); border-radius:10px; overflow:hidden; margin:20px 0; font-size:.8rem; }
+    .lc-cell { border:1px solid var(--gray-4); padding:14px; }
+    .lc-cell.header { background:var(--navy); color:#fff; font-weight:800; font-size:.72rem; letter-spacing:.05em; }
+    .lc-cell.span2 { grid-column:span 2; }
+    .lc-cell.span5 { grid-column:span 5; }
+    .lc-cell.bottom-l { grid-column:span 2; background:#F0FDF9; border-top:2px solid var(--green); }
+    .lc-cell.bottom-r { grid-column:span 3; background:#FFFBF0; border-top:2px solid var(--gold); }
+    .lc-title { font-size:.68rem; font-weight:800; color:var(--gray-3); letter-spacing:.08em; text-transform:uppercase; margin-bottom:6px; }
+    .lc-body { color:var(--gray-2); line-height:1.6; }
+    .lc-body li { margin-left:14px; margin-bottom:3px; }
+    .lc-num { display:inline-block; background:var(--navy); color:#fff; border-radius:50%; width:18px; height:18px; font-size:.65rem; font-weight:800; text-align:center; line-height:18px; margin-right:4px; }
+
+    /* Timeline */
+    .timeline { margin:20px 0; }
+    .tl-item { display:flex; gap:20px; padding-bottom:24px; position:relative; }
+    .tl-item::before { content:''; position:absolute; left:19px; top:36px; bottom:0; width:2px; background:var(--gray-4); }
+    .tl-item:last-child::before { display:none; }
+    .tl-dot { width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:.85rem; font-weight:800; flex-shrink:0; }
+    .tl-dot.q1 { background:var(--blue-l,#EFF6FF); color:var(--blue); border:2px solid var(--blue); }
+    .tl-dot.q2 { background:var(--gold-l,#FEF9EC); color:var(--gold); border:2px solid var(--gold); }
+    .tl-dot.q3 { background:#F0FDF9; color:var(--green); border:2px solid var(--green); }
+    .tl-dot.q4 { background:#EEF3FA; color:var(--navy); border:2px solid var(--navy); }
+    .tl-body { flex:1; }
+    .tl-phase { font-size:.72rem; font-weight:800; color:var(--gray-3); letter-spacing:.08em; text-transform:uppercase; }
+    .tl-title { font-size:1rem; font-weight:800; color:var(--navy); margin-bottom:6px; }
+    .tl-items { list-style:none; }
+    .tl-items li { font-size:.85rem; color:var(--gray-2); padding:3px 0; }
+    .tl-items li::before { content:'→ '; color:var(--gray-4); }
+
+    /* Risk table */
+    .risk-row td:first-child { font-weight:700; }
+    .risk-high { color:#991B1B; font-weight:700; }
+    .risk-mid  { color:#92630A; font-weight:700; }
+    .risk-low  { color:#065F46; font-weight:700; }
+
+    /* KPI */
+    .kpi-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:14px; margin:20px 0; }
+    .kpi-card { background:var(--gray-5); border-radius:10px; padding:18px; text-align:center; }
+    .kpi-val { font-size:1.8rem; font-weight:900; color:var(--navy); }
+    .kpi-label { font-size:.75rem; color:var(--gray-3); margin-top:4px; }
+
+    /* Print */
+    @media print {
+      .page + .page { page-break-before:always; border:none; }
+      .cover { min-height:auto; padding:40px; }
+      nav { display:none; }
+    }
+    @media(max-width:600px){ .lc-grid{grid-template-columns:1fr 1fr;} .lc-cell.span2,.lc-cell.span5,.lc-cell.bottom-l,.lc-cell.bottom-r{grid-column:span 2;} }
+
+    .tag { display:inline-block; font-size:.72rem; font-weight:700; padding:2px 9px; border-radius:100px; margin:2px; }
+    .tag-navy { background:#EEF3FA; color:var(--navy); }
+    .tag-gold { background:#FFFBF0; color:#92630A; }
+    .tag-green { background:#F0FDF9; color:#065F46; }
+    .tag-red { background:#FEF2F2; color:#991B1B; }
+
+    ul.list { padding-left:0; list-style:none; }
+    ul.list li { padding:5px 0 5px 18px; color:var(--gray-2); font-size:.9rem; position:relative; }
+    ul.list li::before { content:'▸'; position:absolute; left:0; color:var(--navy); font-size:.7rem; top:7px; }
+
+    .divider { border:none; border-top:1px solid var(--gray-4); margin:28px 0; }
+    .text-right { text-align:right; }
+    .text-center { text-align:center; }
+    .mt-8 { margin-top:8px; }
+    .mt-16 { margin-top:16px; }
+    .mb-8 { margin-bottom:8px; }
+
+    .print-btn { position:fixed; bottom:24px; right:24px; background:var(--navy); color:#fff; border:none; border-radius:100px; padding:12px 24px; font-size:.85rem; font-weight:800; cursor:pointer; box-shadow:0 4px 16px rgba(0,0,0,.2); z-index:999; }
+    .print-btn:hover { background:#071E40; }
+    @media print { .print-btn { display:none; } }
+  </style>
+</head>
+<body>
+
+<!-- Cover -->
+<div class="cover">
+  <div class="cover-badge">CONFIDENTIAL — 社内共有用</div>
+  <h1>Trust<span>Match</span><br>事業企画書</h1>
+  <p class="cover-sub">「信頼できる日本人と出会えない」という課題を解決する、台湾×日本 信頼スコア型マッチングサービス</p>
+  <div class="cover-meta">
+    <div class="cover-meta-item"><strong>作成日</strong>2025年6月7日</div>
+    <div class="cover-meta-item"><strong>バージョン</strong>v1.0（MVP前）</div>
+    <div class="cover-meta-item"><strong>ステータス</strong>顧客検証フェーズ</div>
+  </div>
+</div>
+
+<!-- 1. エグゼクティブサマリー -->
+<div class="page">
+  <div class="chapter"><div class="chapter-num">1</div><h2>エグゼクティブサマリー</h2></div>
+
+  <div class="callout gold">
+    <div class="callout-label">一言で言うと</div>
+    <p>「<strong>目的に応じた信頼スコア</strong>で、台湾人と信頼できる日本人を繋げるマッチングサービス」<br>スポーツ相手探しから共同創業者探しまで、一つのプラットフォームで対応する。</p>
+  </div>
+
+  <h3>解決する課題</h3>
+  <p>日本で起業・活動したい台湾人が直面する最大の障壁は「<strong>信頼できる日本人と出会えない</strong>」こと。LinkedInやWantedlyは日本語・高コスト・スキル重視で台湾人には使いづらく、「この人を本当に信頼できるか」を判断する手段がない。</p>
+
+  <h3>解決策</h3>
+  <p>2種類の信頼スコアを組み合わせた独自のマッチングシステムを提供する。</p>
+  <div class="score-demo">
+    <div class="score-box sb-gold">
+      <div class="sb-icon">🌐</div>
+      <h4>共通スコア（相対評価）</h4>
+      <p>職歴・学歴・レビュー実績など、誰もが共有できる社会的信頼の指標</p>
+    </div>
+    <div class="score-plus">＋</div>
+    <div class="score-box sb-green">
+      <div class="sb-icon">🎯</div>
+      <h4>個人スコア（絶対評価）</h4>
+      <p>「甲子園経験」「元〇〇社員」など、探す側が独自に設定できる評価軸</p>
+    </div>
+  </div>
+
+  <h3>ターゲット市場（最初の絞り込み）</h3>
+  <ul class="list">
+    <li>日本で起業・事業展開を検討している台湾人経営者・起業家</li>
+    <li>日本出張・旅行時に趣味・交流の相手を探している台湾人</li>
+    <li>台湾との繋がりを求める在日日本人（登録側）</li>
+  </ul>
+
+  <h3>収益モデル（仮）</h3>
+  <ul class="list">
+    <li><strong>紹介料</strong>：マッチング成立時の一回課金（ライト用途：低額、ビジネス用途：高額）</li>
+    <li><strong>サブスクリプション</strong>：「最新スコアへのアクセス権」として月額化を検討</li>
+    <li><strong>スコア更新・証明サービス</strong>：スコアの維持・向上を求めるユーザーへの有料サービス</li>
+  </ul>
+</div>
+
+<!-- 2. 課題と市場 -->
+<div class="page">
+  <div class="chapter"><div class="chapter-num">2</div><h2>課題と市場</h2></div>
+
+  <h3>顧客の課題（検証済み仮説）</h3>
+  <div class="card-grid">
+    <div class="card highlight">
+      <div class="card-icon">❌</div>
+      <h4>信頼できる日本人と出会えない</h4>
+      <p>台湾人視点で「この人を信頼していいか」を判断する客観的な基準・手段がない</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">💸</div>
+      <h4>既存サービスのコストが高い</h4>
+      <p>LinkedInなど優秀な人材を集めるプラットフォームは費用が高く、スタートアップ初期には使えない</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🔍</div>
+      <h4>スキルより「相性・信頼」が重要</h4>
+      <p>特にスタートアップ初期はスキルよりパッション・価値観の一致が成功に直結するが、それを可視化する手段がない</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🌏</div>
+      <h4>文化・言語の壁</h4>
+      <p>台湾人向けに日本人を紹介する文化的文脈に特化したサービスが存在しない</p>
+    </div>
+  </div>
+
+  <h3>競合比較</h3>
+  <table>
+    <tr><th>サービス</th><th>信頼スコア</th><th>個人評価軸</th><th>台湾×日本対応</th><th>軽用途（趣味）</th><th>重用途（ビジネス）</th></tr>
+    <tr><td class="td-hl">TrustMatch（本サービス）</td><td class="td-green">◎ 独自2軸</td><td class="td-green">◎ 自由設定</td><td class="td-green">◎ 特化</td><td class="td-green">◎</td><td class="td-green">◎</td></tr>
+    <tr><td>LinkedIn</td><td class="td-gold">△ 職歴のみ</td><td class="td-red">✕</td><td class="td-red">✕</td><td class="td-red">✕</td><td class="td-gold">△</td></tr>
+    <tr><td>Wantedly</td><td class="td-gold">△ 採用特化</td><td class="td-red">✕</td><td class="td-red">✕</td><td class="td-red">✕</td><td class="td-gold">△</td></tr>
+    <tr><td>Facebook</td><td class="td-red">✕</td><td class="td-red">✕</td><td class="td-gold">△</td><td class="td-gold">△</td><td class="td-red">✕</td></tr>
+    <tr><td>Playmate（自社LP）</td><td class="td-gold">△ レビューのみ</td><td class="td-red">✕</td><td class="td-gold">△</td><td class="td-green">◎</td><td class="td-red">✕</td></tr>
+  </table>
+
+  <h3>差別化の核心</h3>
+  <div class="callout green">
+    <div class="callout-label">圧倒的優位性</div>
+    <p>「<strong>相対評価（共通スコア）× 絶対評価（個人設定）</strong>」の組み合わせは他社に存在しない。台湾×日本という文化的文脈の深さ＋ライト〜ヘビー用途を一つのサービスで対応する設計が参入障壁となる。</p>
+  </div>
+</div>
+
+<!-- 3. ソリューション詳細 -->
+<div class="page">
+  <div class="chapter"><div class="chapter-num">3</div><h2>ソリューション詳細</h2></div>
+
+  <h3>サービスの全体像</h3>
+  <p>TrustMatchは、台湾人ユーザー（探す側）と日本人ユーザー（登録側）をマッチングするプラットフォーム。用途に応じて「信頼スコア」の重みを変えることで、テニス相手探しから共同創業者探しまで一つのサービスで対応する。</p>
+
+  <h3>用途スペクトラム</h3>
+  <table>
+    <tr><th>用途</th><th>必要信頼レベル</th><th>共通スコア目安</th><th>絶対評価の使い方</th><th>課金イメージ</th></tr>
+    <tr><td>🎾 スポーツ・趣味</td><td class="tag tag-navy">ライト</td><td>40以上</td><td>「テニス経験」「中国語OK」など</td><td>無料〜低額</td></tr>
+    <tr><td>🤝 交流・ネットワーク</td><td class="tag tag-gold">ミディアム</td><td>55以上</td><td>「台湾経験あり」「外国人交流好き」</td><td>低〜中額</td></tr>
+    <tr><td>💼 ビジネス協力</td><td class="tag tag-gold">ハイ</td><td>70以上</td><td>「元大企業」「起業経験」</td><td>中〜高額</td></tr>
+    <tr><td>🚀 共同創業者</td><td class="tag tag-red">最高</td><td>80以上</td><td>「甲子園」「M&A経験」「CTO経験」</td><td>高額</td></tr>
+  </table>
+
+  <h3>「一回きり問題」への対応策</h3>
+  <div class="callout">
+    <div class="callout-label">課題</div>
+    <p>一度マッチングが成立すると、同じ人への再課金が発生しない。</p>
+  </div>
+  <div class="callout green mt-8">
+    <div class="callout-label">打ち手（案）</div>
+    <p><strong>①スコアの継続的更新が価値になる設計：</strong>スコアは転職・新実績で変化する。探す側は「最新スコア」を確認するために再利用する動機が生まれる。<br>
+    <strong>②起業家は継続的に人材を必要とする：</strong>CTO候補 → 営業 → 顧問と、フェーズごとに異なる人材が必要になるため自然にリピートが発生する。<br>
+    <strong>③サブスク型への移行：</strong>マッチング課金ではなく「信頼できる人ネットワークへのアクセス権」として月額化する。</p>
+  </div>
+
+  <h3>登録側（日本人）のインセンティブ</h3>
+  <ul class="list">
+    <li>マッチングされるほど自分のスコアが上がる → 経歴の「証明書」になる</li>
+    <li>紹介料の一部がインセンティブとして還元される仕組み（検討中）</li>
+    <li>台湾ビジネス・交流へのアクセス機会</li>
+    <li>スポーツ・趣味の相手を見つける副次的メリット</li>
+  </ul>
+</div>
+
+<!-- 4. リーンキャンバス -->
+<div class="page">
+  <div class="chapter"><div class="chapter-num">4</div><h2>リーンキャンバス</h2></div>
+
+  <div class="lc-grid">
+    <!-- Row 1 headers -->
+    <div class="lc-cell header">① 顧客の課題</div>
+    <div class="lc-cell header">④ ソリューション</div>
+    <div class="lc-cell header">③ 価値提供</div>
+    <div class="lc-cell header">⑨ 圧倒的な優位性</div>
+    <div class="lc-cell header">② 顧客セグメント</div>
+    <!-- Row 1 content -->
+    <div class="lc-cell">
+      <div class="lc-title">PROBLEM</div>
+      <div class="lc-body">
+        <ul style="list-style:none;">
+          <li>・信頼できる日本人と出会えない</li>
+          <li>・スキル評価だけでは不十分</li>
+          <li>・文化的文脈が合うか分からない</li>
+        </ul>
+      </div>
+    </div>
+    <div class="lc-cell">
+      <div class="lc-title">SOLUTION</div>
+      <div class="lc-body">
+        ・相対評価（共通スコア）＋<br>絶対評価（個人設定）を組み合わせたデジタルマッチング<br>・目的別信頼レベル設定
+      </div>
+    </div>
+    <div class="lc-cell">
+      <div class="lc-title">VALUE PROP</div>
+      <div class="lc-body">
+        目的に応じ、<strong>信頼できる日本人を紹介する</strong><br>（スポーツ〜共同創業まで対応）
+      </div>
+    </div>
+    <div class="lc-cell">
+      <div class="lc-title">UNFAIR ADVANTAGE</div>
+      <div class="lc-body">
+        ・2軸評価スコアの設計ロジック<br>・台湾×日本の文化的文脈の深さ<br>・用途幅の広さによるネットワーク効果
+      </div>
+    </div>
+    <div class="lc-cell">
+      <div class="lc-title">CUSTOMER SEGMENT</div>
+      <div class="lc-body">
+        <strong>最重要：</strong>日本で起業する台湾人経営者<br><br>
+        サブ：<br>・日本旅行中の台湾人<br>・台湾交流を求める日本人
+      </div>
+    </div>
+    <!-- Row 2 headers -->
+    <div class="lc-cell header span2">⑧ 主要指標</div>
+    <div class="lc-cell header">（価値）</div>
+    <div class="lc-cell header">⑤ チャネル</div>
+    <div class="lc-cell header">（セグメント）</div>
+    <!-- Row 2 content -->
+    <div class="lc-cell span2">
+      <div class="lc-title">KEY METRICS</div>
+      <div class="lc-body">
+        ・マッチング成立数/月<br>
+        ・マッチング後の満足度スコア<br>
+        ・リピート利用率<br>
+        ・登録日本人プロフィール数<br>
+        ・スコア精度（顧客評価）
+      </div>
+    </div>
+    <div class="lc-cell"><!-- spacer --></div>
+    <div class="lc-cell">
+      <div class="lc-title">CHANNELS</div>
+      <div class="lc-body">
+        ・既存プラットフォーム（Facebook台湾コミュニティ）<br>
+        ・台湾人起業家コミュニティ<br>
+        ・口コミ・紹介
+      </div>
+    </div>
+    <div class="lc-cell"><!-- spacer --></div>
+    <!-- Bottom -->
+    <div class="lc-cell bottom-l span2">
+      <div class="lc-title">⑦ コスト構造</div>
+      <div class="lc-body">
+        ・スコアデータの収集・更新コスト<br>
+        ・プラットフォーム開発・保守コスト<br>
+        ・マッチング担当者（初期は手動）の人件費
+      </div>
+    </div>
+    <div class="lc-cell bottom-r" style="grid-column:span 3">
+      <div class="lc-title">⑥ 収益の流れ</div>
+      <div class="lc-body">
+        ・紹介料（成功報酬型、用途別価格帯）<br>
+        ・月額サブスクリプション（検討中）<br>
+        ・スコア証明・更新サービス（検討中）
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 5. MVP設計 -->
+<div class="page">
+  <div class="chapter"><div class="chapter-num">5</div><h2>MVP設計</h2></div>
+
+  <h3>MVPで検証すること</h3>
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-icon">💡</div>
+      <h4>仮説①：課金意欲</h4>
+      <p>台湾人経営者は「信頼スコア付き紹介」にお金を払うか？</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🎯</div>
+      <h4>仮説②：絶対評価の効果</h4>
+      <p>パッション・趣味の一致が採用・提携の判断に影響するか？</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">👥</div>
+      <h4>仮説③：登録側の動機</h4>
+      <p>日本人側がスコア向上・収入目的でプロフィール登録するか？</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🔄</div>
+      <h4>仮説④：リピート</h4>
+      <p>起業家はフェーズが変わるたびに再利用するか？</p>
+    </div>
+  </div>
+
+  <h3>最小構成のMVP（今すぐ動かせるもの）</h3>
+  <table>
+    <tr><th>機能</th><th>内容</th><th>ツール</th></tr>
+    <tr><td class="td-hl">デモサイト</td><td>双方向評価の体験ができるインタラクティブWebページ（mvp-trust.html）</td><td>HTML/JS（作成済）</td></tr>
+    <tr><td class="td-hl">ヒアリングフォーム</td><td>「何の目的で・どんな日本人を・いくらで」を収集するGoogleフォーム</td><td>Google Forms</td></tr>
+    <tr><td class="td-hl">手動マッチング</td><td>条件を受け取り、人力でプロフィールを提案する</td><td>スプレッドシート</td></tr>
+    <tr><td class="td-hl">事前登録LP</td><td>メール収集・興味確認（既存index.htmlを活用）</td><td>既存LP</td></tr>
+  </table>
+
+  <div class="callout gold">
+    <div class="callout-label">今日の顧客ミーティングでやること</div>
+    <p>
+      <strong>① デモを見せる</strong>（mvp-trust.htmlを開いて、マッチングフローを体験してもらう）<br>
+      <strong>② 課題の確認</strong>（「信頼できる日本人と出会えない」という課題は実感があるか？）<br>
+      <strong>③ 価格感の確認</strong>（どの用途で・いくらなら払うか？）<br>
+      <strong>④ 評価軸の確認</strong>（どんな「絶対評価」条件を重視するか？）
+    </p>
+  </div>
+</div>
+
+<!-- 6. ロードマップ -->
+<div class="page">
+  <div class="chapter"><div class="chapter-num">6</div><h2>ロードマップ</h2></div>
+
+  <div class="timeline">
+    <div class="tl-item">
+      <div class="tl-dot q1">Q3<br><span style="font-size:.6rem">2025</span></div>
+      <div class="tl-body">
+        <div class="tl-phase">PHASE 0 — 顧客検証</div>
+        <div class="tl-title">仮説検証・最初の10マッチング</div>
+        <ul class="tl-items">
+          <li>デモを使った顧客インタビュー（10件）</li>
+          <li>手動マッチングで最初の5〜10件を成立させる</li>
+          <li>課金意欲・価格帯の検証</li>
+          <li>スコア設計の精緻化</li>
+        </ul>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot q2">Q4<br><span style="font-size:.6rem">2025</span></div>
+      <div class="tl-body">
+        <div class="tl-phase">PHASE 1 — プロダクト化</div>
+        <div class="tl-title">プロフィール登録・検索システム構築</div>
+        <ul class="tl-items">
+          <li>日本人プロフィール登録フォーム（50名目標）</li>
+          <li>基本的な検索・マッチング機能開発</li>
+          <li>共通スコアの自動計算ロジック実装</li>
+          <li>最初の有料マッチング（ビジネス用途）</li>
+        </ul>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot q3">Q1<br><span style="font-size:.6rem">2026</span></div>
+      <div class="tl-body">
+        <div class="tl-phase">PHASE 2 — スケール準備</div>
+        <div class="tl-title">スコアシステム強化・コミュニティ形成</div>
+        <ul class="tl-items">
+          <li>スコア更新・証明サービスの開発</li>
+          <li>台湾人コミュニティへのマーケティング本格化</li>
+          <li>マッチング成功事例の蓄積・公開</li>
+          <li>サブスクリプションモデルの検討・実装</li>
+        </ul>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot q4">Q2+<br><span style="font-size:.6rem">2026</span></div>
+      <div class="tl-body">
+        <div class="tl-phase">PHASE 3 — 成長</div>
+        <div class="tl-title">ネットワーク効果の発動</div>
+        <ul class="tl-items">
+          <li>登録日本人500名・マッチング月50件突破</li>
+          <li>日本語・繁体字・英語の完全多言語対応</li>
+          <li>企業向けプランの展開（採用・パートナー探し一括契約）</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 7. KPIとリスク -->
+<div class="page">
+  <div class="chapter"><div class="chapter-num">7</div><h2>KPI と リスク管理</h2></div>
+
+  <h3>フェーズ別KPI目標</h3>
+  <div class="kpi-grid">
+    <div class="kpi-card"><div class="kpi-val">10</div><div class="kpi-label">顧客インタビュー数（3ヶ月以内）</div></div>
+    <div class="kpi-card"><div class="kpi-val">5</div><div class="kpi-label">有料マッチング成立（Phase 1）</div></div>
+    <div class="kpi-card"><div class="kpi-val">50</div><div class="kpi-label">登録日本人プロフィール数（Phase 1）</div></div>
+    <div class="kpi-card"><div class="kpi-val">80%</div><div class="kpi-label">マッチング後満足度（目標）</div></div>
+    <div class="kpi-card"><div class="kpi-val">30%</div><div class="kpi-label">リピート利用率（目標）</div></div>
+    <div class="kpi-card"><div class="kpi-val">¥?</div><div class="kpi-label">顧客1件あたりの支払い意欲（要検証）</div></div>
+  </div>
+
+  <h3>リスクと対策</h3>
+  <table class="risk-row">
+    <tr><th>リスク</th><th>深刻度</th><th>対策</th></tr>
+    <tr><td>「一回きり問題」による収益の低さ</td><td class="risk-high">高</td><td>起業家ターゲットへの絞り込み（継続的人材ニーズ）＋サブスク検討</td></tr>
+    <tr><td>登録日本人が集まらない（供給不足）</td><td class="risk-high">高</td><td>知人ネットワークからの手動登録でスタート。スコアを「経歴証明書」として価値化</td></tr>
+    <tr><td>スコアの信頼性・精度が低い</td><td class="risk-mid">中</td><td>初期は人力検証＋レビュー蓄積。段階的に自動化</td></tr>
+    <tr><td>LinkedInなど大手の参入</td><td class="risk-mid">中</td><td>台湾×日本という文化的文脈の深さ＋個人設定スコアで差別化</td></tr>
+    <tr><td>不正プロフィール・信頼スコア詐称</td><td class="risk-mid">中</td><td>eKYC本人確認必須＋段階的検証プロセス</td></tr>
+    <tr><td>収益化前の資金ショート</td><td class="risk-low">低（要監視）</td><td>MVP期は人件費ゼロで運用できる手動マッチングを優先</td></tr>
+  </table>
+
+  <h3>「仲良しクラブ化」リスクへの対策</h3>
+  <div class="callout">
+    <div class="callout-label">チームビルディングの注意点</div>
+    <p>初期チームは「スキル重視」より「パッション・価値観の一致」を優先。ただし「仲良すぎて数字を追えなくなる」リスクに備え、早期からOKR等の数値管理の仕組みを導入する。成長フェーズでは不足スキル（開発・営業）を外部から補完する。</p>
+  </div>
+</div>
+
+<!-- 8. 次のアクション -->
+<div class="page">
+  <div class="chapter"><div class="chapter-num">8</div><h2>次のアクション（チーム共有）</h2></div>
+
+  <h3>今日（顧客ミーティング前後）</h3>
+  <table>
+    <tr><th>タスク</th><th>担当</th><th>期限</th></tr>
+    <tr><td>MVPデモ（mvp-trust.html）を顧客に見せる</td><td>—</td><td>本日</td></tr>
+    <tr><td>インタビューシートに基づいてヒアリング実施</td><td>—</td><td>本日</td></tr>
+    <tr><td>「絶対評価で何を重視するか」を収集</td><td>—</td><td>本日</td></tr>
+    <tr><td>「いくらなら払うか」の価格感を確認</td><td>—</td><td>本日</td></tr>
+  </table>
+
+  <h3>今週中</h3>
+  <table>
+    <tr><th>タスク</th><th>担当</th><th>期限</th></tr>
+    <tr><td>ヒアリング結果をスプレッドシートに集約</td><td>—</td><td>今週中</td></tr>
+    <tr><td>最初の登録日本人プロフィール10名を確保（知人ネットワーク）</td><td>—</td><td>今週中</td></tr>
+    <tr><td>手動マッチング用フォーマットを作成</td><td>—</td><td>今週中</td></tr>
+    <tr><td>サービス名の確定（TrustMatchは仮称）</td><td>—</td><td>今週中</td></tr>
+  </table>
+
+  <h3>今月中</h3>
+  <table>
+    <tr><th>タスク</th><th>担当</th><th>期限</th></tr>
+    <tr><td>顧客インタビュー10件完了</td><td>—</td><td>今月</td></tr>
+    <tr><td>初回有料マッチング1件成立</td><td>—</td><td>今月</td></tr>
+    <tr><td>共通スコアの評価項目リスト確定</td><td>—</td><td>今月</td></tr>
+    <tr><td>収益モデル（価格帯）の方向性決定</td><td>—</td><td>今月</td></tr>
+  </table>
+
+  <div class="callout gold" style="margin-top:36px;">
+    <div class="callout-label">チームへのメッセージ</div>
+    <p>このサービスの最大の強みは「<strong>信頼スコア × 文化的文脈の深さ × 用途幅の広さ</strong>」という3点の掛け合わせです。スピードを持って顧客検証を進め、何が「本当に刺さるか」を早期に特定することが最優先事項です。MVP期は完璧なシステムより、<strong>顧客が「これが欲しかった」と言う瞬間</strong>を1件でも作ることに集中しましょう。</p>
+  </div>
+</div>
+
+<button class="print-btn" onclick="window.print()">🖨️ 印刷 / PDF保存</button>
+
+</body>
+</html>

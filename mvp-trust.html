@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TrustMatch — 信頼できる日本人と出会う</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --navy:#0B2B5A; --navy-d:#071E40; --navy-l:#EEF3FA;
+      --gold:#E8A020; --gold-l:#FEF9EC;
+      --blue:#2563EB; --blue-l:#EFF6FF;
+      --green:#059669; --green-l:#ECFDF5;
+      --gray-1:#111827; --gray-2:#374151; --gray-3:#6B7280; --gray-4:#D1D5DB; --gray-5:#F9FAFB;
+      --white:#FFFFFF; --radius:12px;
+      --shadow:0 4px 24px rgba(0,0,0,.08); --shadow-lg:0 8px 40px rgba(0,0,0,.14);
+    }
+    body { font-family:'Hiragino Sans','Noto Sans JP','Yu Gothic',Arial,sans-serif; color:var(--gray-1); background:var(--white); line-height:1.6; }
+
+    nav { position:fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:space-between; padding:12px 5vw; background:rgba(11,43,90,.96); backdrop-filter:blur(12px); gap:12px; }
+    .logo { font-size:1.3rem; font-weight:800; color:var(--white); letter-spacing:-.5px; flex-shrink:0; }
+    .logo span { color:var(--gold); }
+    .lang-toggle { display:flex; gap:4px; flex-shrink:0; }
+    .lang-btn { padding:5px 9px; border-radius:6px; border:1.5px solid rgba(255,255,255,.3); background:none; font-size:.75rem; font-weight:700; cursor:pointer; color:rgba(255,255,255,.6); transition:all .15s; }
+    .lang-btn.active { background:var(--gold); color:var(--navy); border-color:var(--gold); }
+    nav a.cta-nav { background:var(--gold); color:var(--navy); padding:8px 18px; border-radius:100px; font-size:.82rem; font-weight:800; text-decoration:none; flex-shrink:0; white-space:nowrap; }
+    nav a.cta-nav:hover { background:#d4911a; }
+
+    .hero { min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:120px 5vw 80px; background:linear-gradient(155deg,#0B2B5A 0%,#1A3A6B 55%,#0D2040 100%); position:relative; overflow:hidden; }
+    .hero::before { content:''; position:absolute; top:-100px; right:-80px; width:480px; height:480px; border-radius:50%; background:radial-gradient(circle,rgba(232,160,32,.18) 0%,transparent 70%); }
+    .hero::after  { content:''; position:absolute; bottom:-60px; left:-60px; width:380px; height:380px; border-radius:50%; background:radial-gradient(circle,rgba(37,99,235,.18) 0%,transparent 70%); }
+    .badge { display:inline-block; margin-bottom:20px; background:rgba(232,160,32,.15); color:var(--gold); border:1px solid rgba(232,160,32,.3); padding:6px 18px; border-radius:100px; font-size:.8rem; font-weight:700; }
+    .hero h1 { font-size:clamp(1.8rem,4.5vw,3.2rem); font-weight:900; line-height:1.2; letter-spacing:-.5px; margin-bottom:20px; color:var(--white); }
+    .hero h1 em { color:var(--gold); font-style:normal; }
+    .hero p.sub { font-size:clamp(.95rem,2vw,1.15rem); color:rgba(255,255,255,.75); max-width:580px; margin:0 auto 36px; }
+    .score-pills { display:flex; gap:16px; justify-content:center; flex-wrap:wrap; margin-bottom:36px; }
+    .score-pill { background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.2); border-radius:100px; padding:10px 20px; display:flex; align-items:center; gap:10px; color:var(--white); font-size:.85rem; font-weight:600; }
+    .dot { width:10px; height:10px; border-radius:50%; }
+    .dot-gold { background:var(--gold); }
+    .dot-green { background:var(--green); }
+    .dot-plus { color:rgba(255,255,255,.4); font-weight:900; font-size:1rem; }
+    .hero-cta { display:inline-flex; align-items:center; gap:10px; background:var(--gold); color:var(--navy); padding:16px 36px; border-radius:100px; font-size:1rem; font-weight:800; text-decoration:none; box-shadow:0 4px 24px rgba(232,160,32,.4); transition:all .2s; }
+    .hero-cta:hover { background:#d4911a; transform:translateY(-2px); }
+
+    section { padding:80px 5vw; }
+    .section-label { font-size:.78rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; margin-bottom:8px; color:var(--navy); }
+    .section-title { font-size:clamp(1.5rem,3vw,2.2rem); font-weight:900; margin-bottom:12px; }
+    .section-sub { color:var(--gray-3); max-width:540px; margin:0 auto 48px; }
+    .center { text-align:center; }
+    .bg-light { background:var(--gray-5); }
+
+    .how-steps { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:24px; max-width:860px; margin:0 auto; }
+    .how-step { text-align:center; padding:24px; }
+    .how-step .num { width:44px; height:44px; border-radius:50%; background:var(--navy); color:var(--white); font-weight:900; display:flex; align-items:center; justify-content:center; margin:0 auto 16px; }
+    .how-step .ico { font-size:2rem; margin-bottom:12px; }
+    .how-step h3 { font-size:.95rem; font-weight:800; margin-bottom:8px; }
+    .how-step p { font-size:.82rem; color:var(--gray-3); }
+
+    .trust-grid { display:grid; grid-template-columns:1fr auto 1fr; gap:24px; align-items:center; max-width:860px; margin:0 auto; }
+    @media(max-width:640px){ .trust-grid { grid-template-columns:1fr; } .trust-plus-col { display:none; } }
+    .trust-card { background:var(--white); border-radius:var(--radius); padding:32px 28px; box-shadow:var(--shadow); }
+    .trust-card.c-common { border-top:4px solid var(--gold); }
+    .trust-card.c-personal { border-top:4px solid var(--green); }
+    .trust-card .t-ico { font-size:2.2rem; margin-bottom:14px; }
+    .trust-card h3 { font-size:1rem; font-weight:800; margin-bottom:8px; }
+    .trust-card.c-common h3 { color:#92630A; }
+    .trust-card.c-personal h3 { color:#065F46; }
+    .trust-card p { font-size:.82rem; color:var(--gray-3); margin-bottom:14px; }
+    .ex-tags { display:flex; flex-wrap:wrap; gap:6px; }
+    .ex-tag { font-size:.72rem; font-weight:700; padding:3px 10px; border-radius:100px; }
+    .c-common .ex-tag { background:var(--gold-l); color:#92630A; }
+    .c-personal .ex-tag { background:var(--green-l); color:#065F46; }
+    .trust-plus-col { font-size:2.5rem; font-weight:900; color:var(--gray-4); text-align:center; }
+    .trust-result { margin-top:28px; background:var(--navy-l); border:1.5px solid rgba(11,43,90,.15); border-radius:var(--radius); padding:20px 28px; max-width:860px; margin:28px auto 0; text-align:center; font-size:.88rem; color:var(--gray-2); }
+    .trust-result strong { color:var(--navy); }
+
+    /* Demo */
+    .demo-wrap { max-width:900px; margin:0 auto; }
+    .step-progress { display:flex; align-items:center; justify-content:center; margin-bottom:40px; }
+    .sp-item { display:flex; flex-direction:column; align-items:center; gap:6px; }
+    .sp-circle { width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:.85rem; transition:all .3s; }
+    .sp-circle.active { background:var(--navy); color:var(--white); }
+    .sp-circle.done { background:var(--green); color:var(--white); }
+    .sp-circle.pending { background:var(--gray-4); color:var(--gray-3); }
+    .sp-label { font-size:.7rem; font-weight:600; color:var(--gray-3); white-space:nowrap; }
+    .sp-label.active { color:var(--navy); font-weight:800; }
+    .sp-line { width:60px; height:2px; background:var(--gray-4); flex-shrink:0; transition:background .3s; }
+    .sp-line.done { background:var(--green); }
+    @media(max-width:480px){ .sp-line{width:32px;} .sp-label{font-size:.62rem;} }
+
+    .step-panel { display:none; }
+    .step-panel.active { display:block; }
+
+    .purpose-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(175px,1fr)); gap:16px; }
+    .purpose-card { border:2px solid var(--gray-4); border-radius:var(--radius); padding:24px 18px; cursor:pointer; transition:all .2s; text-align:center; background:var(--white); }
+    .purpose-card:hover { border-color:var(--navy); transform:translateY(-2px); box-shadow:var(--shadow); }
+    .purpose-card.sel { border-color:var(--navy); background:var(--navy-l); }
+    .p-ico { font-size:1.9rem; margin-bottom:10px; }
+    .p-title { font-size:.88rem; font-weight:800; margin-bottom:5px; }
+    .p-sub { font-size:.73rem; color:var(--gray-3); margin-bottom:10px; }
+    .p-trust { display:inline-block; font-size:.68rem; font-weight:700; padding:2px 8px; border-radius:100px; }
+    .tl { background:var(--blue-l); color:var(--blue); }
+    .tm { background:var(--gold-l); color:#92630A; }
+    .th { background:#FEE2E2; color:#991B1B; }
+
+    .criteria-box { background:var(--white); border-radius:var(--radius); padding:28px; box-shadow:var(--shadow); }
+    .crit-section { margin-bottom:26px; }
+    .crit-label { font-size:.875rem; font-weight:800; color:var(--gray-2); margin-bottom:10px; display:flex; align-items:center; gap:8px; }
+    .crit-badge { font-size:.68rem; font-weight:700; padding:2px 8px; border-radius:100px; }
+    .cb-gold { background:var(--gold-l); color:#92630A; }
+    .cb-green { background:var(--green-l); color:#065F46; }
+    .crit-desc { font-size:.8rem; color:var(--gray-3); margin-bottom:12px; }
+    .slider-row { display:flex; align-items:center; gap:16px; }
+    .score-slider { flex:1; -webkit-appearance:none; height:6px; border-radius:3px; background:var(--gray-4); outline:none; cursor:pointer; }
+    .score-slider::-webkit-slider-thumb { -webkit-appearance:none; width:22px; height:22px; border-radius:50%; background:var(--navy); cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,.18); }
+    .score-val { font-size:1.4rem; font-weight:900; color:var(--navy); min-width:48px; text-align:right; }
+    .slider-labels { display:flex; justify-content:space-between; font-size:.7rem; color:var(--gray-3); margin-top:4px; }
+    .tags-row { display:flex; flex-wrap:wrap; gap:8px; }
+    .tag { padding:6px 14px; border-radius:100px; font-size:.79rem; font-weight:700; cursor:pointer; transition:all .2s; border:1.5px solid var(--gray-4); background:var(--white); color:var(--gray-2); }
+    .tag:hover { border-color:var(--green); color:var(--green); }
+    .tag.sel { background:var(--green-l); border-color:var(--green); color:#065F46; }
+    .lang-opts { display:flex; flex-wrap:wrap; gap:8px; }
+    .lang-opt { padding:6px 14px; border-radius:100px; font-size:.79rem; font-weight:700; cursor:pointer; border:1.5px solid var(--gray-4); background:var(--white); color:var(--gray-2); transition:all .2s; }
+    .lang-opt:hover { border-color:var(--blue); color:var(--blue); }
+    .lang-opt.sel { background:var(--blue-l); border-color:var(--blue); color:var(--blue); }
+
+    .results-bar { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; flex-wrap:wrap; gap:10px; }
+    .res-count { font-size:.875rem; color:var(--gray-3); }
+    .res-count strong { color:var(--navy); font-size:1.1rem; }
+    .sort-label { font-size:.78rem; font-weight:700; color:var(--gray-3); }
+
+    .profile-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(255px,1fr)); gap:20px; }
+    .profile-card { background:var(--white); border:1.5px solid var(--gray-4); border-radius:var(--radius); padding:22px; cursor:pointer; transition:all .2s; }
+    .profile-card:hover { border-color:var(--navy); box-shadow:var(--shadow); transform:translateY(-2px); }
+    .pc-top { display:flex; align-items:flex-start; gap:14px; margin-bottom:14px; }
+    .pc-avatar { width:52px; height:52px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.4rem; flex-shrink:0; }
+    .pc-name { font-size:1rem; font-weight:800; margin-bottom:2px; }
+    .pc-meta { font-size:.76rem; color:var(--gray-3); }
+    .score-duo { display:flex; gap:10px; margin-bottom:12px; }
+    .sd-box { flex:1; border-radius:8px; padding:10px 12px; text-align:center; }
+    .sd-common { background:var(--gold-l); }
+    .sd-personal { background:var(--green-l); }
+    .sd-label { font-size:.63rem; font-weight:700; margin-bottom:3px; }
+    .sd-common .sd-label { color:#92630A; }
+    .sd-personal .sd-label { color:#065F46; }
+    .sd-num { font-size:1.55rem; font-weight:900; line-height:1; }
+    .sd-common .sd-num { color:var(--gold); }
+    .sd-personal .sd-num { color:var(--green); }
+    .sd-unit { font-size:.62rem; color:var(--gray-3); }
+    .pc-tags { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:12px; }
+    .pc-tag { font-size:.7rem; font-weight:700; padding:3px 8px; border-radius:100px; background:var(--gray-5); color:var(--gray-2); border:1px solid var(--gray-4); }
+    .pc-tag.hi { background:var(--navy-l); color:var(--navy); border-color:rgba(11,43,90,.2); }
+    .match-btn { width:100%; padding:10px 0; border-radius:8px; border:none; background:var(--navy); color:var(--white); font-size:.85rem; font-weight:800; cursor:pointer; transition:background .2s; }
+    .match-btn:hover { background:var(--navy-d); }
+
+    .btn-row { display:flex; justify-content:flex-end; gap:12px; margin-top:28px; flex-wrap:wrap; }
+    .btn-p { background:var(--navy); color:var(--white); border:none; border-radius:8px; padding:12px 28px; font-size:.9rem; font-weight:800; cursor:pointer; text-decoration:none; display:inline-block; transition:background .2s; }
+    .btn-p:hover { background:var(--navy-d); }
+    .btn-s { background:var(--white); color:var(--navy); border:2px solid var(--navy); border-radius:8px; padding:10px 26px; font-size:.9rem; font-weight:800; cursor:pointer; transition:all .2s; }
+    .btn-s:hover { background:var(--navy-l); }
+
+    .modal-ov { position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:200; display:none; align-items:center; justify-content:center; padding:20px; }
+    .modal-ov.open { display:flex; }
+    .modal { background:var(--white); border-radius:16px; max-width:500px; width:100%; max-height:85vh; overflow-y:auto; padding:32px; position:relative; }
+    .modal-close { position:absolute; top:14px; right:14px; width:30px; height:30px; border-radius:50%; border:none; background:var(--gray-5); cursor:pointer; font-size:.95rem; display:flex; align-items:center; justify-content:center; }
+    .modal-close:hover { background:var(--gray-4); }
+    .m-avatar { width:76px; height:76px; border-radius:50%; font-size:2.1rem; display:flex; align-items:center; justify-content:center; margin:0 auto 14px; }
+    .m-name { text-align:center; font-size:1.25rem; font-weight:900; margin-bottom:4px; }
+    .m-sub { text-align:center; font-size:.82rem; color:var(--gray-3); margin-bottom:22px; }
+    .m-scores { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:22px; }
+    .m-score-box { border-radius:12px; padding:16px; text-align:center; }
+    .m-score-box .ms-lbl { font-size:.68rem; font-weight:800; margin-bottom:5px; }
+    .m-score-box .ms-num { font-size:2.6rem; font-weight:900; line-height:1; }
+    .m-score-box .ms-unit { font-size:.68rem; color:var(--gray-3); }
+    .m-section-title { font-size:.76rem; font-weight:800; color:var(--gray-3); letter-spacing:.08em; text-transform:uppercase; margin-bottom:10px; }
+    .m-details { list-style:none; }
+    .m-details li { display:flex; gap:10px; padding:8px 0; border-bottom:1px solid var(--gray-5); font-size:.85rem; }
+    .m-details li:last-child { border-bottom:none; }
+    .m-match-btn { width:100%; padding:14px 0; border-radius:10px; border:none; background:var(--navy); color:var(--white); font-size:1rem; font-weight:800; cursor:pointer; margin-top:20px; transition:background .2s; }
+    .m-match-btn:hover { background:var(--navy-d); }
+
+    .usecase-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:20px; max-width:900px; margin:0 auto; }
+    .uc-card { border-radius:var(--radius); padding:28px 24px; }
+    .uc-light { background:var(--blue-l); border:1.5px solid rgba(37,99,235,.15); }
+    .uc-mid   { background:var(--gold-l); border:1.5px solid rgba(232,160,32,.25); }
+    .uc-heavy { background:#FEE2E2; border:1.5px solid rgba(220,38,38,.15); }
+    .uc-ico { font-size:2rem; margin-bottom:10px; }
+    .uc-card h3 { font-size:.95rem; font-weight:800; margin-bottom:8px; }
+    .uc-light h3 { color:var(--blue); } .uc-mid h3 { color:#92630A; } .uc-heavy h3 { color:#991B1B; }
+    .uc-card p { font-size:.8rem; color:var(--gray-2); margin-bottom:12px; }
+    .uc-req { font-size:.7rem; font-weight:700; padding:3px 10px; border-radius:100px; display:inline-block; color:var(--white); }
+    .uc-light .uc-req { background:var(--blue); }
+    .uc-mid   .uc-req { background:var(--gold); }
+    .uc-heavy .uc-req { background:#DC2626; }
+
+    .cta-bg { background:linear-gradient(135deg,var(--navy) 0%,#1A3A6B 100%); }
+    .cta-form { background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.15); border-radius:var(--radius); padding:28px 32px; max-width:460px; margin:0 auto; }
+    .cta-form input { width:100%; border:1.5px solid rgba(255,255,255,.2); border-radius:8px; padding:12px 16px; font-size:.95rem; background:rgba(255,255,255,.1); color:var(--white); margin-bottom:12px; outline:none; transition:border-color .2s; }
+    .cta-form input::placeholder { color:rgba(255,255,255,.4); }
+    .cta-form input:focus { border-color:var(--gold); }
+    .cta-submit { width:100%; padding:14px 0; border-radius:8px; border:none; background:var(--gold); color:var(--navy); font-size:1rem; font-weight:800; cursor:pointer; transition:background .2s; }
+    .cta-submit:hover { background:#d4911a; }
+
+    footer { background:var(--navy-d); color:rgba(255,255,255,.45); text-align:center; padding:28px 5vw; font-size:.78rem; }
+    footer a { color:rgba(255,255,255,.4); }
+
+    #toast { position:fixed; bottom:28px; left:50%; transform:translateX(-50%); background:var(--gray-1); color:var(--white); padding:12px 26px; border-radius:100px; font-size:.85rem; font-weight:700; box-shadow:0 6px 28px rgba(0,0,0,.22); opacity:0; pointer-events:none; z-index:9999; transition:opacity .3s; white-space:nowrap; }
+    #toast.show { opacity:1; }
+
+    @media(max-width:600px){ .profile-grid{grid-template-columns:1fr;} .modal{padding:22px 18px;} .trust-grid{gap:16px;} }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">Trust<span>Match</span></div>
+  <div class="lang-toggle">
+    <button class="lang-btn active" id="lb-ja" onclick="setLang('ja')">日</button>
+    <button class="lang-btn" id="lb-zh" onclick="setLang('zh-TW')">繁</button>
+  </div>
+  <a href="#demo" class="cta-nav" id="nav-cta">デモを試す</a>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="badge" id="h-badge">🇯🇵 日本人マッチング・ベータ版テスター募集中</div>
+  <h1 id="h-title">目的に合わせて、<em>信頼できる日本人</em>と出会う。</h1>
+  <p class="sub" id="h-sub">旅先でのテニス相手探しから、共同創業者・取引先探しまで。独自の「信頼スコア」で、あなたの目的に最適な日本人をご紹介します。</p>
+  <div class="score-pills">
+    <div class="score-pill"><div class="dot dot-gold"></div><span id="pill-c">共通スコア（社会的信頼）</span></div>
+    <span class="dot-plus">＋</span>
+    <div class="score-pill"><div class="dot dot-green"></div><span id="pill-p">あなただけの評価基準</span></div>
+  </div>
+  <a href="#demo" class="hero-cta" id="h-cta">マッチングを試してみる →</a>
+</section>
+
+<!-- How it works -->
+<section class="center bg-light">
+  <div class="section-label" id="how-lbl">HOW IT WORKS</div>
+  <h2 class="section-title" id="how-ttl">たった3ステップ</h2>
+  <p class="section-sub" id="how-sub">目的を選んで、条件を設定するだけ。</p>
+  <div class="how-steps">
+    <div class="how-step"><div class="num">1</div><div class="ico">🎯</div><h3 id="h1t">目的を選ぶ</h3><p id="h1b">スポーツ相手からビジネスパートナーまで。目的に応じて信頼基準が変わります。</p></div>
+    <div class="how-step"><div class="num">2</div><div class="ico">⚙️</div><h3 id="h2t">条件を設定</h3><p id="h2b">共通スコアの最低基準と、あなただけの絶対評価条件を設定します。</p></div>
+    <div class="how-step"><div class="num">3</div><div class="ico">🤝</div><h3 id="h3t">マッチングする</h3><p id="h3b">条件に合った日本人が表示されます。プロフィールを確認してリクエストを送るだけ。</p></div>
+  </div>
+</section>
+
+<!-- Trust score explanation -->
+<section class="center">
+  <div class="section-label" id="ts-lbl">TRUST SYSTEM</div>
+  <h2 class="section-title" id="ts-ttl">なぜ「2種類の信頼スコア」なのか？</h2>
+  <p class="section-sub" id="ts-sub">一般的な評価だけでは不十分。あなたの目的に合った「信頼」は人それぞれです。</p>
+  <div class="trust-grid">
+    <div class="trust-card c-common">
+      <div class="t-ico">🌐</div>
+      <h3 id="tc-ttl">共通スコア（相対評価）</h3>
+      <p id="tc-body">誰もが共有できる社会的信頼の指標。職歴・学歴・レビュー実績・本人確認状況などをもとに算出。</p>
+      <div class="ex-tags">
+        <span class="ex-tag" id="ex1">正規雇用歴</span><span class="ex-tag" id="ex2">学歴</span><span class="ex-tag" id="ex3">レビュー評価</span><span class="ex-tag" id="ex4">本人確認済</span><span class="ex-tag" id="ex5">SNS実績</span>
+      </div>
+    </div>
+    <div class="trust-plus-col">＋</div>
+    <div class="trust-card c-personal">
+      <div class="t-ico">🎯</div>
+      <h3 id="tp-ttl">個人スコア（絶対評価）</h3>
+      <p id="tp-body">あなたが特に重視したい条件を自由に設定。あなたにとっての「信頼」の基準を反映したオーダーメイドの評価軸。</p>
+      <div class="ex-tags">
+        <span class="ex-tag" id="ex6">甲子園出場経験</span><span class="ex-tag" id="ex7">元〇〇社員</span><span class="ex-tag" id="ex8">中国語話者</span><span class="ex-tag" id="ex9">起業経験</span><span class="ex-tag" id="ex10">テニス歴10年↑</span>
+      </div>
+    </div>
+  </div>
+  <div class="trust-result" id="ts-result">2つのスコアを掛け合わせることで、<strong>「誰にでも信頼できる人」</strong>と<strong>「あなたにとって特に信頼できる人」</strong>の両方を同時に探せます。</div>
+</section>
+
+<!-- Interactive Demo -->
+<section class="bg-light" id="demo">
+  <div class="center" style="margin-bottom:40px;">
+    <div class="section-label" id="dm-lbl">INTERACTIVE DEMO</div>
+    <h2 class="section-title" id="dm-ttl">実際にマッチングを試してみる</h2>
+    <p class="section-sub" id="dm-sub">目的と条件を選ぶだけで、あなたに合った日本人が見つかります。</p>
+  </div>
+  <div class="demo-wrap">
+    <div class="step-progress">
+      <div class="sp-item"><div class="sp-circle active" id="sc1">1</div><div class="sp-label active" id="sl1">目的を選ぶ</div></div>
+      <div class="sp-line" id="ln1"></div>
+      <div class="sp-item"><div class="sp-circle pending" id="sc2">2</div><div class="sp-label" id="sl2">条件を設定</div></div>
+      <div class="sp-line" id="ln2"></div>
+      <div class="sp-item"><div class="sp-circle pending" id="sc3">3</div><div class="sp-label" id="sl3">マッチング結果</div></div>
+    </div>
+
+    <!-- Step 1 -->
+    <div class="step-panel active" id="panel1">
+      <div class="purpose-grid">
+        <div class="purpose-card" id="pc-sports" onclick="selectP('sports')">
+          <div class="p-ico">🎾</div>
+          <div class="p-title" id="p1t">スポーツ・趣味</div>
+          <div class="p-sub" id="p1s">テニス、ゴルフ等、一緒に楽しめる相手を探す</div>
+          <span class="p-trust tl" id="p1r">信頼度：ライト</span>
+        </div>
+        <div class="purpose-card" id="pc-network" onclick="selectP('network')">
+          <div class="p-ico">🤝</div>
+          <div class="p-title" id="p2t">交流・ネットワーク</div>
+          <div class="p-sub" id="p2s">語学練習、地域のつながり、人脈づくり</div>
+          <span class="p-trust tm" id="p2r">信頼度：ミディアム</span>
+        </div>
+        <div class="purpose-card" id="pc-biz" onclick="selectP('biz')">
+          <div class="p-ico">💼</div>
+          <div class="p-title" id="p3t">ビジネス協力</div>
+          <div class="p-sub" id="p3s">取引先、顧問、アドバイザーを探す</div>
+          <span class="p-trust tm" id="p3r">信頼度：ハイ</span>
+        </div>
+        <div class="purpose-card" id="pc-cofounder" onclick="selectP('cofounder')">
+          <div class="p-ico">🚀</div>
+          <div class="p-title" id="p4t">共同創業者</div>
+          <div class="p-sub" id="p4s">一緒に会社を作る仲間を探す</div>
+          <span class="p-trust th" id="p4r">信頼度：最高</span>
+        </div>
+      </div>
+      <div class="btn-row"><button class="btn-p" onclick="goStep(2)" id="s1next">次へ →</button></div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="step-panel" id="panel2">
+      <div class="criteria-box">
+        <div class="crit-section">
+          <div class="crit-label">🌐 <span id="cl1">共通スコアの最低基準</span><span class="crit-badge cb-gold" id="cb1">相対評価</span></div>
+          <p class="crit-desc" id="cd1">社会的な信頼の最低ラインを設定します。高いほど信頼性が高い人に絞り込まれます。</p>
+          <div class="slider-row">
+            <input type="range" class="score-slider" id="c-slider" min="0" max="100" value="60" oninput="updateScore(this.value)">
+            <div class="score-val" id="score-disp">60</div>
+          </div>
+          <div class="slider-labels"><span id="sl-lo">低め（ライト用途）</span><span id="sl-hi">高め（ビジネス用途）</span></div>
+        </div>
+        <div class="crit-section">
+          <div class="crit-label">🎯 <span id="cl2">あなただけの条件（絶対評価）</span><span class="crit-badge cb-green" id="cb2">個人設定</span></div>
+          <p class="crit-desc" id="cd2">あなたが特に重視したい条件を選んでください（複数可）。</p>
+          <div class="tags-row" id="tags-container"></div>
+        </div>
+        <div class="crit-section">
+          <div class="crit-label">🗣️ <span id="cl3">希望言語</span></div>
+          <div class="lang-opts">
+            <div class="lang-opt sel" onclick="toggleL(this,'ja')" id="lo-ja">🇯🇵 日本語</div>
+            <div class="lang-opt sel" onclick="toggleL(this,'zh')" id="lo-zh">🇹🇼 中国語OK</div>
+            <div class="lang-opt" onclick="toggleL(this,'en')" id="lo-en">🇺🇸 英語OK</div>
+          </div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-s" onclick="goStep(1)" id="s2back">← 戻る</button>
+        <button class="btn-p" onclick="goStep(3)" id="s2next">マッチングを探す 🔍</button>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="step-panel" id="panel3">
+      <div class="results-bar">
+        <div class="res-count"><strong id="res-n">4</strong><span id="res-lbl"> 名がマッチしました</span></div>
+        <span class="sort-label" id="sort-lbl">スコア順 ▼</span>
+      </div>
+      <div class="profile-grid" id="profile-grid"></div>
+      <div class="btn-row" style="margin-top:28px;">
+        <button class="btn-s" onclick="goStep(2)" id="s3back">← 条件を変更</button>
+        <a href="#register" class="btn-p" id="s3reg">正式登録する →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Use cases -->
+<section class="center">
+  <div class="section-label" id="uc-lbl">USE CASES</div>
+  <h2 class="section-title" id="uc-ttl">こんなシーンで使える</h2>
+  <p class="section-sub" id="uc-sub">ライトな出会いから、重要なビジネスの決断まで。</p>
+  <div class="usecase-grid">
+    <div class="uc-card uc-light"><div class="uc-ico">🎾</div><h3 id="uc1t">旅行・スポーツ</h3><p id="uc1b">日本出張中にテニス相手が欲しい。中国語が話せて同じ趣味を持つ日本人と休日を楽しむ。</p><span class="uc-req" id="uc1r">共通スコア 40以上</span></div>
+    <div class="uc-card uc-mid"><div class="uc-ico">🤝</div><h3 id="uc2t">ビジネス交流</h3><p id="uc2b">日本で取引先や顧問を探したい。業界経験と信頼実績がある日本人プロと繋がる。</p><span class="uc-req" id="uc2r">共通スコア 65以上</span></div>
+    <div class="uc-card uc-heavy"><div class="uc-ico">🚀</div><h3 id="uc3t">共同創業・事業提携</h3><p id="uc3b">価値観・パッションが合い、高い信頼性を持つ日本人の共同創業者を探す。</p><span class="uc-req" id="uc3r">共通スコア 80以上 + 絶対評価必須</span></div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-bg center" id="register">
+  <div class="section-label" style="color:var(--gold)" id="cta-lbl">BETA REGISTRATION</div>
+  <h2 class="section-title" style="color:var(--white)" id="cta-ttl">先行テスターとして登録する</h2>
+  <p class="section-sub" style="color:rgba(255,255,255,.7)" id="cta-sub">ベータ版のリリース時に最優先でご案内します。完全無料。</p>
+  <div class="cta-form">
+    <input type="email" id="cta-email" placeholder="メールアドレスを入力">
+    <button class="cta-submit" onclick="submitReg()" id="cta-btn">先行登録する（無料）</button>
+    <p style="font-size:.73rem;color:rgba(255,255,255,.35);margin-top:10px;" id="cta-micro">スパムは送りません。リリース時のみご連絡します。</p>
+  </div>
+</section>
+
+<footer>
+  <p id="ft-copy">© 2025 TrustMatch — ベータ版</p>
+  <p style="margin-top:6px;" id="ft-contact">お問い合わせ: <a href="mailto:hello@trustmatch.example">hello@trustmatch.example</a></p>
+</footer>
+
+<!-- Profile Modal -->
+<div class="modal-ov" id="modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="m-avatar" id="m-av"></div>
+    <div class="m-name" id="m-nm"></div>
+    <div class="m-sub" id="m-sb"></div>
+    <div class="m-scores" id="m-sc"></div>
+    <div class="m-section-title" id="m-det-lbl">プロフィール詳細</div>
+    <ul class="m-details" id="m-det"></ul>
+    <button class="m-match-btn" id="m-btn" onclick="sendReq()">マッチングリクエストを送る</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ── Data ──────────────────────────────────────────────────
+const profiles = [
+  { id:1, av:'👨‍💼', bg:'#EEF3FA', commonScore:88,
+    name:{ja:'田中 誠', zh:'田中 誠'},
+    meta:{ja:'45歳・東京・元トヨタ自動車エンジニア', zh:'45歲・東京・前豐田汽車工程師'},
+    details:{
+      ja:['💼 元トヨタ自動車（20年勤務）、現在は中小企業コンサル','🎾 テニス歴15年・週末プレイヤー','🗣️ 日本語・英語（中国語学習中）','🚀 起業支援の経験あり（3社に関与）','🏆 製造業・モノづくり分野の人脈が豊富'],
+      zh:['💼 前豐田汽車（20年資歷），現從事中小企業顧問','🎾 網球15年資歷，週末球友','🗣️ 日語・英語（學習中文）','🚀 新創顧問，曾參與3家公司','🏆 製造業・硬體領域人脈豐富'],
+    },
+    tags:{ja:['元トヨタ','テニス15年','起業支援','英語OK'], zh:['前豐田','網球15年','新創經驗','英語OK']},
+    hi:['元トヨタ','テニス15年','前豐田','網球15年'],
+    ps:{sports:95, network:80, biz:88, cofounder:76},
+  },
+  { id:2, av:'👩‍💻', bg:'#ECFDF5', commonScore:93,
+    name:{ja:'鈴木 花子', zh:'鈴木 花子'},
+    meta:{ja:'34歳・渋谷・スタートアップCTO', zh:'34歲・澀谷・新創公司CTO'},
+    details:{
+      ja:['💻 元Google Japan、現在フィンテックスタートアップCTO','🎓 慶應義塾大学・情報工学専攻','🗣️ 日本語・英語・中国語（HSK5級）','🚀 2社の起業経験（1社はM&A成功）','🇹🇼 台湾のVC・スタートアップエコシステムに詳しい'],
+      zh:['💻 前Google Japan，現任金融科技新創CTO','🎓 慶應義塾大學資訊工程系','🗣️ 日語・英語・中文（HSK5級）','🚀 兩次創業（其中一家成功被併購）','🇹🇼 熟悉台灣VC・新創生態系'],
+    },
+    tags:{ja:['元Google','CTO経験','中国語HSK5','M&A経験'], zh:['前Google','CTO經驗','中文HSK5','M&A經驗']},
+    hi:['元Google','CTO経験','中国語HSK5','前Google','CTO經驗','中文HSK5'],
+    ps:{sports:42, network:85, biz:95, cofounder:98},
+  },
+  { id:3, av:'👨‍🏫', bg:'#FEF9EC', commonScore:96,
+    name:{ja:'山田 大輔', zh:'山田 大輔'},
+    meta:{ja:'52歳・名古屋・連続起業家・投資家', zh:'52歲・名古屋・連續創業者・投資人'},
+    details:{
+      ja:['🏆 甲子園出場（ピッチャー）・元プロ野球選手','🚀 5社連続起業、うち2社を上場','💰 エンジェル投資家（30社以上に投資）','🇹🇼 台湾事業展開の経験あり','🗣️ 日本語のみ（通訳対応可）'],
+      zh:['🏆 甲子園出賽（投手），前職業棒球選手','🚀 連續創業5次，其中2家成功上市','💰 天使投資人（投資30家以上）','🇹🇼 有台灣市場拓展經驗','🗣️ 僅日語（可安排口譯）'],
+    },
+    tags:{ja:['甲子園','上場2回','エンジェル投資家','台湾経験'], zh:['甲子園','上市2次','天使投資人','台灣經驗']},
+    hi:['甲子園','上場2回','エンジェル投資家','上市2次','天使投資人'],
+    ps:{sports:68, network:85, biz:92, cofounder:90},
+  },
+  { id:4, av:'👩‍🎾', bg:'#EFF6FF', commonScore:74,
+    name:{ja:'佐藤 美咲', zh:'佐藤 美咲'},
+    meta:{ja:'28歳・台中在住・テニスコーチ', zh:'28歲・定居台中・網球教練'},
+    details:{
+      ja:['🎾 テニスコーチ歴5年・JTA認定コーチ','🏠 台中在住（日本人）・台湾生活3年','🗣️ 日本語・中国語（日常会話）・英語','🌏 台湾文化・日台交流に精通','👫 スポーツを通じた交流イベントを主催'],
+      zh:['🎾 網球教練5年，JTA認證教練','🏠 定居台中（日本人），台灣生活3年','🗣️ 日語・中文（生活會話）・英語','🌏 熟悉台灣文化・日台交流','👫 主辦以運動為主題的交流活動'],
+    },
+    tags:{ja:['台中在住','テニスコーチ','中国語OK','日台交流'], zh:['住台中','網球教練','中文OK','日台交流']},
+    hi:['台中在住','テニスコーチ','中国語OK','住台中','網球教練','中文OK'],
+    ps:{sports:98, network:80, biz:48, cofounder:38},
+  },
+];
+
+// ── Translations ──────────────────────────────────────────
+const T = {
+  ja:{
+    navCta:'デモを試す', badge:'🇯🇵 日本人マッチング・ベータ版テスター募集中',
+    h1:'目的に合わせて、<em>信頼できる日本人</em>と出会う。',
+    hsub:'旅先でのテニス相手探しから、共同創業者・取引先探しまで。独自の「信頼スコア」で、あなたの目的に最適な日本人をご紹介します。',
+    pillC:'共通スコア（社会的信頼）', pillP:'あなただけの評価基準', hcta:'マッチングを試してみる →',
+    howLbl:'HOW IT WORKS', howTtl:'たった3ステップ', howSub:'目的を選んで、条件を設定するだけ。',
+    h1t:'目的を選ぶ', h1b:'スポーツ相手からビジネスパートナーまで。目的に応じて信頼基準が変わります。',
+    h2t:'条件を設定', h2b:'共通スコアの最低基準と、あなただけの絶対評価条件を設定します。',
+    h3t:'マッチングする', h3b:'条件に合った日本人が表示されます。プロフィールを確認してリクエストを送るだけ。',
+    tsLbl:'TRUST SYSTEM', tsTtl:'なぜ「2種類の信頼スコア」なのか？', tsSub:'一般的な評価だけでは不十分。あなたの目的に合った「信頼」は人それぞれです。',
+    tcTtl:'共通スコア（相対評価）', tcBody:'誰もが共有できる社会的信頼の指標。職歴・学歴・レビュー実績・本人確認状況などをもとに算出。',
+    ex:['正規雇用歴','学歴','レビュー評価','本人確認済','SNS実績','甲子園出場経験','元〇〇社員','中国語話者','起業経験','テニス歴10年↑'],
+    tpTtl:'個人スコア（絶対評価）', tpBody:'あなたが特に重視したい条件を自由に設定。あなたにとっての「信頼」の基準を反映したオーダーメイドの評価軸。',
+    tsResult:'2つのスコアを掛け合わせることで、<strong>「誰にでも信頼できる人」</strong>と<strong>「あなたにとって特に信頼できる人」</strong>の両方を同時に探せます。',
+    dmLbl:'INTERACTIVE DEMO', dmTtl:'実際にマッチングを試してみる', dmSub:'目的と条件を選ぶだけで、あなたに合った日本人が見つかります。',
+    sl1:'目的を選ぶ', sl2:'条件を設定', sl3:'マッチング結果',
+    p1t:'スポーツ・趣味', p1s:'テニス、ゴルフ等、一緒に楽しめる相手を探す', p1r:'信頼度：ライト',
+    p2t:'交流・ネットワーク', p2s:'語学練習、地域のつながり、人脈づくり', p2r:'信頼度：ミディアム',
+    p3t:'ビジネス協力', p3s:'取引先、顧問、アドバイザーを探す', p3r:'信頼度：ハイ',
+    p4t:'共同創業者', p4s:'一緒に会社を作る仲間を探す', p4r:'信頼度：最高',
+    s1next:'次へ →',
+    cl1:'共通スコアの最低基準', cb1:'相対評価', cd1:'社会的な信頼の最低ラインを設定します。高いほど信頼性が高い人に絞り込まれます。',
+    slLo:'低め（ライト用途）', slHi:'高め（ビジネス用途）',
+    cl2:'あなただけの条件（絶対評価）', cb2:'個人設定', cd2:'あなたが特に重視したい条件を選んでください（複数可）。',
+    cl3:'希望言語', loJa:'🇯🇵 日本語', loZh:'🇹🇼 中国語OK', loEn:'🇺🇸 英語OK',
+    s2back:'← 戻る', s2next:'マッチングを探す 🔍',
+    resLbl:' 名がマッチしました', sortLbl:'スコア順 ▼',
+    s3back:'← 条件を変更', s3reg:'正式登録する →', matchBtn:'マッチングリクエストを送る',
+    ucLbl:'USE CASES', ucTtl:'こんなシーンで使える', ucSub:'ライトな出会いから、重要なビジネスの決断まで。',
+    uc1t:'旅行・スポーツ', uc1b:'日本出張中にテニス相手が欲しい。中国語が話せて同じ趣味を持つ日本人と休日を楽しむ。', uc1r:'共通スコア 40以上',
+    uc2t:'ビジネス交流', uc2b:'日本で取引先や顧問を探したい。業界経験と信頼実績がある日本人プロと繋がる。', uc2r:'共通スコア 65以上',
+    uc3t:'共同創業・事業提携', uc3b:'価値観・パッションが合い、高い信頼性を持つ日本人の共同創業者を探す。', uc3r:'共通スコア 80以上 + 絶対評価必須',
+    ctaLbl:'BETA REGISTRATION', ctaTtl:'先行テスターとして登録する', ctaSub:'ベータ版のリリース時に最優先でご案内します。完全無料。',
+    ctaEmail:'メールアドレスを入力', ctaBtn:'先行登録する（無料）', ctaMicro:'スパムは送りません。リリース時のみご連絡します。',
+    ftCopy:'© 2025 TrustMatch — ベータ版', ftContact:'お問い合わせ:',
+    detLbl:'プロフィール詳細', psLbl:'適合度',
+    toastOK:'✅ 登録完了！リリース時にご連絡します。', toastNoMail:'⚠️ メールアドレスを正しく入力してください',
+    toastSent:'✅ リクエストを送りました！確認後ご連絡します。', toastNoP:'⚠️ まず目的を選んでください',
+    criteriaMap:{
+      sports:['テニス経験','中国語OK','週末参加可能','道具貸出可','ゴルフ経験','台湾在住歴あり'],
+      network:['中国語OK','英語OK','台湾経験あり','外国人交流好き','ビジネス人脈'],
+      biz:['起業経験','元大企業勤務','台湾ビジネス経験','業界専門家','投資家ネットワーク'],
+      cofounder:['起業経験あり','甲子園経験','元〇〇社員','エンジェル投資家','M&A経験','CTO経験','パッション重視'],
+    },
+  },
+  'zh-TW':{
+    navCta:'試用配對', badge:'🇯🇵 日本人配對・Beta版測試者招募中',
+    h1:'依照目的，找到<em>值得信任的日本人</em>。',
+    hsub:'從旅行時找網球夥伴的輕度使用，到尋找共同創業者、合作夥伴的商業應用，獨特的「信任分數」系統幫您找到最合適的日本人。',
+    pillC:'通用分數（社會信任）', pillP:'您的個人評分標準', hcta:'試試看配對流程 →',
+    howLbl:'使用流程', howTtl:'只需3個步驟', howSub:'選擇目的，設定條件，就這麼簡單。',
+    h1t:'選擇目的', h1b:'從找運動夥伴到尋找商業合作者，依據目的調整信任標準。',
+    h2t:'設定條件', h2b:'設定通用分數最低基準，以及您個人重視的絕對評分條件。',
+    h3t:'開始配對', h3b:'符合條件的日本人會顯示出來，確認資料後送出請求即可。',
+    tsLbl:'TRUST SYSTEM', tsTtl:'為什麼需要「2種信任分數」？', tsSub:'單一評分標準不夠，每個人對「信任」的定義因目的而異。',
+    tcTtl:'通用分數（相對評分）', tcBody:'如同社會信用評分，這是所有人共享的社會性信任指標。根據職歷、學歷、評價記錄、身份認證等計算。',
+    ex:['正式就職記錄','學歷','評價記錄','實名認證','SNS實績','甲子園出賽經驗','前○○公司員工','中文使用者','創業經驗','網球10年以上'],
+    tpTtl:'個人分數（絕對評分）', tpBody:'自由設定您特別重視的條件，反映您個人對「信任」的定義，量身打造的評分軸。',
+    tsResult:'兩種分數結合，讓您同時找到<strong>「對任何人都值得信任的人」</strong>和<strong>「對您特別值得信任的人」</strong>。',
+    dmLbl:'互動示範', dmTtl:'親自體驗配對流程', dmSub:'只需選擇目的和條件，就能找到適合您的日本人。',
+    sl1:'選擇目的', sl2:'設定條件', sl3:'配對結果',
+    p1t:'運動・興趣', p1s:'尋找可以一起打網球、高爾夫的夥伴', p1r:'信任需求：輕度',
+    p2t:'交流・拓展人脈', p2s:'語言練習、在地連結、人際拓展', p2r:'信任需求：中度',
+    p3t:'商業合作', p3s:'尋找交易夥伴、顧問、商業協作者', p3r:'信任需求：高度',
+    p4t:'共同創業者', p4s:'尋找一起創立公司的夥伴', p4r:'信任需求：最高',
+    s1next:'下一步 →',
+    cl1:'通用分數最低基準', cb1:'相對評分', cd1:'設定社會信任的最低門檻。分數越高，篩選出的對象越可信。',
+    slLo:'較低（輕度用途）', slHi:'較高（商業用途）',
+    cl2:'您的個人條件（絕對評分）', cb2:'個人設定', cd2:'請選擇您特別重視的條件（可多選）。',
+    cl3:'希望使用語言', loJa:'🇯🇵 日語', loZh:'🇹🇼 中文OK', loEn:'🇺🇸 英語OK',
+    s2back:'← 返回', s2next:'尋找配對 🔍',
+    resLbl:' 位符合條件', sortLbl:'依分數排序 ▼',
+    s3back:'← 修改條件', s3reg:'正式報名 →', matchBtn:'送出配對請求',
+    ucLbl:'使用情境', ucTtl:'適用的各種場景', ucSub:'從輕鬆的邂逅到重要的商業決策，一個平台全包辦。',
+    uc1t:'旅行・運動', uc1b:'出差日本期間想找網球夥伴。和會說中文、有共同興趣的日本人共度週末。', uc1r:'通用分數 40以上',
+    uc2t:'商業交流', uc2b:'在日本尋找交易夥伴或顧問。與有業界經驗和信任實績的日本專業人士建立連結。', uc2r:'通用分數 65以上',
+    uc3t:'共同創業・事業合作', uc3b:'想在日本找到一起創業的夥伴。尋找價值觀・熱情契合且高度可信的日本人。', uc3r:'通用分數 80以上 + 絕對評分必要',
+    ctaLbl:'BETA REGISTRATION', ctaTtl:'申請成為先行測試者', ctaSub:'Beta版上線時將優先通知您，完全免費。',
+    ctaEmail:'輸入電子郵件地址', ctaBtn:'免費先行報名', ctaMicro:'不會發送垃圾郵件，僅在上線時通知您。',
+    ftCopy:'© 2025 TrustMatch — Beta版', ftContact:'洽詢:',
+    detLbl:'個人檔案詳情', psLbl:'適合度',
+    toastOK:'✅ 報名成功！上線時將通知您。', toastNoMail:'⚠️ 請輸入有效的電子郵件地址',
+    toastSent:'✅ 已送出請求！確認後將與您聯絡。', toastNoP:'⚠️ 請先選擇目的',
+    criteriaMap:{
+      sports:['網球經驗','中文OK','週末可參加','可借用器材','高爾夫經驗','有台灣生活經驗'],
+      network:['中文OK','英語OK','有台灣經驗','喜歡與外國人交流','商業人脈'],
+      biz:['創業經驗','曾任職大企業','台灣商業經驗','業界專家','投資人脈'],
+      cofounder:['有創業經驗','甲子園經驗','前○○公司','天使投資人','M&A經驗','CTO經驗','重視熱情'],
+    },
+  },
+};
+
+// ── State ─────────────────────────────────────────────────
+let lang = 'ja', step = 1, purpose = null, scoreMin = 60;
+let selTags = new Set(), selLangs = new Set(['ja','zh']);
+
+// ── i18n ──────────────────────────────────────────────────
+function setLang(l) {
+  lang = l;
+  const t = T[l];
+  ['ja','zh'].forEach(k => document.getElementById('lb-'+k).classList.toggle('active', (k==='zh'?'zh-TW':k)===l));
+
+  const ids = {
+    'nav-cta':'navCta','h-badge':'badge','h-sub':'hsub','pill-c':'pillC','pill-p':'pillP','h-cta':'hcta',
+    'how-lbl':'howLbl','how-ttl':'howTtl','how-sub':'howSub','h1t':'h1t','h1b':'h1b','h2t':'h2t','h2b':'h2b','h3t':'h3t','h3b':'h3b',
+    'ts-lbl':'tsLbl','ts-ttl':'tsTtl','ts-sub':'tsSub','tc-ttl':'tcTtl','tc-body':'tcBody','tp-ttl':'tpTtl','tp-body':'tpBody',
+    'ex1':'ex.0','ex2':'ex.1','ex3':'ex.2','ex4':'ex.3','ex5':'ex.4','ex6':'ex.5','ex7':'ex.6','ex8':'ex.7','ex9':'ex.8','ex10':'ex.9',
+    'dm-lbl':'dmLbl','dm-ttl':'dmTtl','dm-sub':'dmSub',
+    'sl1':'sl1','sl2':'sl2','sl3':'sl3',
+    'p1t':'p1t','p1s':'p1s','p1r':'p1r','p2t':'p2t','p2s':'p2s','p2r':'p2r',
+    'p3t':'p3t','p3s':'p3s','p3r':'p3r','p4t':'p4t','p4s':'p4s','p4r':'p4r',
+    's1next':'s1next','cl1':'cl1','cb1':'cb1','cd1':'cd1','sl-lo':'slLo','sl-hi':'slHi',
+    'cl2':'cl2','cb2':'cb2','cd2':'cd2','cl3':'cl3','lo-ja':'loJa','lo-zh':'loZh','lo-en':'loEn',
+    's2back':'s2back','s2next':'s2next','res-lbl':'resLbl','sort-lbl':'sortLbl',
+    's3back':'s3back','s3reg':'s3reg',
+    'uc-lbl':'ucLbl','uc-ttl':'ucTtl','uc-sub':'ucSub',
+    'uc1t':'uc1t','uc1b':'uc1b','uc1r':'uc1r','uc2t':'uc2t','uc2b':'uc2b','uc2r':'uc2r','uc3t':'uc3t','uc3b':'uc3b','uc3r':'uc3r',
+    'cta-lbl':'ctaLbl','cta-ttl':'ctaTtl','cta-sub':'ctaSub','cta-btn':'ctaBtn','cta-micro':'ctaMicro',
+    'ft-copy':'ftCopy','ft-contact':'ftContact',
+    'm-det-lbl':'detLbl','m-btn':'matchBtn',
+  };
+
+  Object.entries(ids).forEach(([id, key]) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const val = key.includes('.') ? t[key.split('.')[0]][parseInt(key.split('.')[1])] : t[key];
+    if (val !== undefined) el.textContent = val;
+  });
+
+  // HTML elements
+  const h1 = document.getElementById('h-title');
+  if (h1) h1.innerHTML = t.h1;
+  const tr = document.getElementById('ts-result');
+  if (tr) tr.innerHTML = t.tsResult;
+
+  const em = document.getElementById('cta-email');
+  if (em) em.placeholder = t.ctaEmail;
+
+  if (purpose) renderTags();
+  if (step === 3) renderProfiles();
+}
+
+// ── Step nav ──────────────────────────────────────────────
+function goStep(s) {
+  if (s === 2 && !purpose) { showToast(T[lang].toastNoP); return; }
+  step = s;
+  [1,2,3].forEach(n => document.getElementById('panel'+n).classList.toggle('active', n===s));
+  [1,2,3].forEach(n => {
+    const c = document.getElementById('sc'+n), lb = document.getElementById('sl'+n);
+    c.className = 'sp-circle '+(n<s?'done':n===s?'active':'pending');
+    c.textContent = n<s?'✓':n;
+    lb.className = 'sp-label'+(n===s?' active':'');
+  });
+  [1,2].forEach(n => document.getElementById('ln'+n).className = 'sp-line'+(s>n?' done':''));
+  if (s===2) renderTags();
+  if (s===3) renderProfiles();
+  document.getElementById('demo').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+// ── Purpose ───────────────────────────────────────────────
+function selectP(p) {
+  purpose = p;
+  ['sports','network','biz','cofounder'].forEach(id => document.getElementById('pc-'+id).classList.toggle('sel', id===p));
+  const defaults = {sports:40, network:55, biz:70, cofounder:82};
+  scoreMin = defaults[p];
+  const sl = document.getElementById('c-slider');
+  if (sl) { sl.value = scoreMin; updateScore(scoreMin); }
+}
+
+function updateScore(v) {
+  scoreMin = parseInt(v);
+  document.getElementById('score-disp').textContent = v;
+}
+
+// ── Tags ──────────────────────────────────────────────────
+function renderTags() {
+  const t = T[lang], tags = t.criteriaMap[purpose] || [];
+  const c = document.getElementById('tags-container');
+  c.innerHTML = tags.map(tag => `<div class="tag${selTags.has(tag)?' sel':''}" onclick="toggleTag(this,'${tag}')">${tag}</div>`).join('');
+}
+function toggleTag(el, tag) { el.classList.toggle('sel'); selTags.has(tag)?selTags.delete(tag):selTags.add(tag); }
+function toggleL(el, l) { el.classList.toggle('sel'); selLangs.has(l)?selLangs.delete(l):selLangs.add(l); }
+
+// ── Profiles ──────────────────────────────────────────────
+function renderProfiles() {
+  const t = T[lang], isZh = lang==='zh-TW';
+  const lk = isZh?'zh':'ja';
+  const filtered = profiles.filter(p => p.commonScore >= scoreMin);
+  document.getElementById('res-n').textContent = filtered.length;
+  const sorted = [...filtered].sort((a,b) => (b.commonScore*.5+b.ps[purpose]*.5)-(a.commonScore*.5+a.ps[purpose]*.5));
+  const grid = document.getElementById('profile-grid');
+  grid.innerHTML = sorted.map(p => {
+    const ps = p.ps[purpose];
+    const tags = p.tags[lk]||[];
+    const tagsHtml = tags.map(tag => `<span class="pc-tag${p.hi.some(h=>tag.includes(h.slice(0,2)))?' hi':''}">${tag}</span>`).join('');
+    return `<div class="profile-card" onclick="openModal(${p.id})">
+      <div class="pc-top">
+        <div class="pc-avatar" style="background:${p.bg}">${p.av}</div>
+        <div><div class="pc-name">${p.name[lk]}</div><div class="pc-meta">${p.meta[lk]}</div></div>
+      </div>
+      <div class="score-duo">
+        <div class="sd-box sd-common"><div class="sd-label">共通スコア</div><div class="sd-num">${p.commonScore}</div><div class="sd-unit">/ 100</div></div>
+        <div class="sd-box sd-personal"><div class="sd-label">${t.psLbl}</div><div class="sd-num">${ps}<span style="font-size:.85rem">%</span></div></div>
+      </div>
+      <div class="pc-tags">${tagsHtml}</div>
+      <button class="match-btn">${t.matchBtn}</button>
+    </div>`;
+  }).join('');
+}
+
+// ── Modal ─────────────────────────────────────────────────
+function openModal(id) {
+  const p = profiles.find(x=>x.id===id), t=T[lang], lk=lang==='zh-TW'?'zh':'ja';
+  const ps = p.ps[purpose||'sports'];
+  document.getElementById('m-av').style.background = p.bg;
+  document.getElementById('m-av').textContent = p.av;
+  document.getElementById('m-nm').textContent = p.name[lk];
+  document.getElementById('m-sb').textContent = p.meta[lk];
+  document.getElementById('m-det-lbl').textContent = t.detLbl;
+  document.getElementById('m-btn').textContent = t.matchBtn;
+  document.getElementById('m-sc').innerHTML = `
+    <div class="m-score-box" style="background:var(--gold-l)"><div class="ms-lbl" style="color:#92630A">共通スコア</div><div class="ms-num" style="color:var(--gold)">${p.commonScore}</div><div class="ms-unit">/ 100</div></div>
+    <div class="m-score-box" style="background:var(--green-l)"><div class="ms-lbl" style="color:#065F46">${t.psLbl}</div><div class="ms-num" style="color:var(--green)">${ps}</div><div class="ms-unit">%</div></div>`;
+  const details = p.details[lk]||[];
+  document.getElementById('m-det').innerHTML = details.map(d=>`<li><span style="flex-shrink:0">${d.split(' ')[0]}</span><span>${d.split(' ').slice(1).join(' ')}</span></li>`).join('');
+  document.getElementById('modal').classList.add('open');
+}
+function closeModal() { document.getElementById('modal').classList.remove('open'); }
+function sendReq() { closeModal(); showToast(T[lang].toastSent); }
+document.getElementById('modal').addEventListener('click', function(e){ if(e.target===this) closeModal(); });
+
+// ── Register ──────────────────────────────────────────────
+function submitReg() {
+  const t=T[lang], email=document.getElementById('cta-email').value.trim();
+  if(!email||!email.includes('@')){ showToast(t.toastNoMail); return; }
+  document.getElementById('cta-email').value='';
+  showToast(t.toastOK);
+}
+
+// ── Toast ─────────────────────────────────────────────────
+function showToast(msg) {
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),3200);
+}
+
+// Smooth scroll
+document.querySelectorAll('a[href^="#"]').forEach(a=>a.addEventListener('click',e=>{
+  e.preventDefault(); const t=document.querySelector(a.getAttribute('href'));
+  if(t) t.scrollIntoView({behavior:'smooth',block:'start'});
+}));
+
+setLang('ja');
+</script>
+</body>
+</html>
