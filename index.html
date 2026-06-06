@@ -4,326 +4,193 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Playmate — 旅先でスポーツ仲間を、今すぐ。</title>
-  <meta name="description" content="出張・旅行先で今日・明日スポーツを一緒に楽しめる現地パートナーを、地図上で即座に見つけられるマッチングアプリ。台中で先行ベータ版の登録を受付中。">
+  <meta name="description" content="Find sports partners in your travel city, instantly. Taichung beta sign-ups open.">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --blue:    #1A56DB;
-      --blue-d:  #1239a6;
-      --blue-l:  #EBF2FF;
-      --green:   #0E9F6E;
-      --orange:  #FF5A1F;
-      --gray-1:  #111827;
-      --gray-2:  #374151;
-      --gray-3:  #6B7280;
-      --gray-4:  #D1D5DB;
-      --gray-5:  #F9FAFB;
-      --white:   #FFFFFF;
-      --radius:  12px;
-      --shadow:  0 4px 24px rgba(0,0,0,.10);
+      --blue:#1A56DB; --blue-d:#1239a6; --blue-l:#EBF2FF;
+      --green:#0E9F6E; --orange:#FF5A1F;
+      --gray-1:#111827; --gray-2:#374151; --gray-3:#6B7280; --gray-4:#D1D5DB; --gray-5:#F9FAFB;
+      --white:#FFFFFF; --radius:12px; --shadow:0 4px 24px rgba(0,0,0,.10);
     }
+    body { font-family:'Hiragino Sans','Noto Sans JP','Yu Gothic',Arial,sans-serif; color:var(--gray-1); background:var(--white); line-height:1.6; }
 
-    body { font-family: 'Hiragino Sans', 'Noto Sans JP', 'Yu Gothic', Arial, sans-serif; color: var(--gray-1); background: var(--white); line-height: 1.6; }
+    /* Nav */
+    nav { position:fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:space-between; padding:12px 5vw; background:rgba(255,255,255,.92); backdrop-filter:blur(12px); border-bottom:1px solid rgba(0,0,0,.06); gap:12px; }
+    .logo { font-size:1.3rem; font-weight:800; color:var(--blue); letter-spacing:-.5px; flex-shrink:0; }
+    .logo span { color:var(--orange); }
+    .lang-toggle { display:flex; gap:4px; flex-shrink:0; }
+    .lang-btn { padding:5px 9px; border-radius:6px; border:1.5px solid var(--gray-4); background:none; font-size:.75rem; font-weight:700; cursor:pointer; color:var(--gray-3); transition:all .15s; }
+    .lang-btn.active { background:var(--blue); color:white; border-color:var(--blue); }
+    nav a.cta-nav { background:var(--blue); color:var(--white); padding:8px 18px; border-radius:100px; font-size:.82rem; font-weight:700; text-decoration:none; transition:background .2s; flex-shrink:0; white-space:nowrap; }
+    nav a.cta-nav:hover { background:var(--blue-d); }
 
-    /* ── Nav ── */
-    nav {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 14px 5vw;
-      background: rgba(255,255,255,.92); backdrop-filter: blur(12px);
-      border-bottom: 1px solid rgba(0,0,0,.06);
-    }
-    .logo { font-size: 1.3rem; font-weight: 800; color: var(--blue); letter-spacing: -.5px; }
-    .logo span { color: var(--orange); }
-    nav a.cta-nav {
-      background: var(--blue); color: var(--white);
-      padding: 8px 20px; border-radius: 100px; font-size: .85rem; font-weight: 700;
-      text-decoration: none; transition: background .2s;
-    }
-    nav a.cta-nav:hover { background: var(--blue-d); }
+    /* Hero */
+    .hero { min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:120px 5vw 80px; background:linear-gradient(160deg,#EBF2FF 0%,#ffffff 60%); position:relative; overflow:hidden; }
+    .hero::before { content:''; position:absolute; top:-120px; right:-120px; width:500px; height:500px; border-radius:50%; background:radial-gradient(circle,rgba(26,86,219,.12) 0%,transparent 70%); }
+    .hero::after  { content:''; position:absolute; bottom:-80px; left:-80px; width:400px; height:400px; border-radius:50%; background:radial-gradient(circle,rgba(255,90,31,.08) 0%,transparent 70%); }
+    .badge { display:inline-block; margin-bottom:20px; background:var(--blue-l); color:var(--blue); border:1px solid rgba(26,86,219,.2); padding:5px 16px; border-radius:100px; font-size:.8rem; font-weight:700; }
+    .hero h1 { font-size:clamp(2rem,5vw,3.6rem); font-weight:900; line-height:1.2; letter-spacing:-.5px; margin-bottom:20px; color:var(--gray-1); }
+    .hero h1 em { color:var(--blue); font-style:normal; }
+    .hero p.sub { font-size:clamp(1rem,2.5vw,1.2rem); color:var(--gray-2); max-width:560px; margin:0 auto 40px; }
 
-    /* ── Hero ── */
-    .hero {
-      min-height: 100vh;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      text-align: center;
-      padding: 120px 5vw 80px;
-      background: linear-gradient(160deg, #EBF2FF 0%, #ffffff 60%);
-      position: relative; overflow: hidden;
-    }
-    .hero::before {
-      content: '';
-      position: absolute; top: -120px; right: -120px;
-      width: 500px; height: 500px; border-radius: 50%;
-      background: radial-gradient(circle, rgba(26,86,219,.12) 0%, transparent 70%);
-    }
-    .hero::after {
-      content: '';
-      position: absolute; bottom: -80px; left: -80px;
-      width: 400px; height: 400px; border-radius: 50%;
-      background: radial-gradient(circle, rgba(255,90,31,.08) 0%, transparent 70%);
-    }
-    .badge {
-      display: inline-block; margin-bottom: 20px;
-      background: var(--blue-l); color: var(--blue);
-      border: 1px solid rgba(26,86,219,.2);
-      padding: 5px 16px; border-radius: 100px; font-size: .8rem; font-weight: 700;
-    }
-    .hero h1 {
-      font-size: clamp(2rem, 5vw, 3.6rem);
-      font-weight: 900; line-height: 1.2; letter-spacing: -.5px;
-      margin-bottom: 20px; color: var(--gray-1);
-    }
-    .hero h1 em { color: var(--blue); font-style: normal; }
-    .hero p.sub {
-      font-size: clamp(1rem, 2.5vw, 1.2rem);
-      color: var(--gray-2); max-width: 560px; margin: 0 auto 40px;
-    }
+    /* Register box */
+    .register-box { background:var(--white); border-radius:var(--radius); box-shadow:var(--shadow); padding:28px 32px; max-width:480px; width:100%; margin:0 auto; position:relative; z-index:1; }
+    .register-box p { font-size:.85rem; color:var(--gray-3); margin-bottom:14px; }
+    .field-group { display:flex; gap:10px; flex-wrap:wrap; }
+    .field-group input[type="email"] { flex:1; min-width:0; border:1.5px solid var(--gray-4); border-radius:8px; padding:12px 16px; font-size:.95rem; outline:none; transition:border-color .2s; }
+    .field-group input[type="email"]:focus { border-color:var(--blue); }
+    .btn-register { background:var(--blue); color:var(--white); border:none; border-radius:8px; padding:12px 24px; font-size:.95rem; font-weight:700; cursor:pointer; white-space:nowrap; transition:background .2s; }
+    .btn-register:hover { background:var(--blue-d); }
+    .register-box .micro { font-size:.75rem; color:var(--gray-3); margin-top:10px; margin-bottom:0; }
+    .role-toggle { display:flex; gap:8px; margin-bottom:16px; }
+    .role-btn { flex:1; padding:9px 0; border-radius:8px; border:1.5px solid var(--gray-4); background:var(--white); font-size:.82rem; font-weight:700; cursor:pointer; transition:all .2s; color:var(--gray-3); }
+    .role-btn.active-traveler { background:var(--blue-l); border-color:var(--blue); color:var(--blue); }
+    .role-btn.active-local { background:#ECFDF5; border-color:var(--green); color:var(--green); }
 
-    /* ── Register box ── */
-    .register-box {
-      background: var(--white); border-radius: var(--radius);
-      box-shadow: var(--shadow); padding: 28px 32px;
-      max-width: 480px; width: 100%; margin: 0 auto;
-      position: relative; z-index: 1;
-    }
-    .register-box p { font-size: .85rem; color: var(--gray-3); margin-bottom: 14px; }
-    .field-group { display: flex; gap: 10px; flex-wrap: wrap; }
-    .field-group input[type="email"] {
-      flex: 1; min-width: 0;
-      border: 1.5px solid var(--gray-4); border-radius: 8px;
-      padding: 12px 16px; font-size: .95rem; outline: none;
-      transition: border-color .2s;
-    }
-    .field-group input[type="email"]:focus { border-color: var(--blue); }
-    .btn-register {
-      background: var(--blue); color: var(--white);
-      border: none; border-radius: 8px;
-      padding: 12px 24px; font-size: .95rem; font-weight: 700;
-      cursor: pointer; white-space: nowrap; transition: background .2s;
-    }
-    .btn-register:hover { background: var(--blue-d); }
-    .register-box .micro { font-size: .75rem; color: var(--gray-3); margin-top: 10px; margin-bottom: 0; }
+    /* Stats */
+    .stats { display:flex; justify-content:center; gap:40px; flex-wrap:wrap; padding:48px 5vw; background:var(--gray-1); }
+    .stat { text-align:center; }
+    .stat .num { font-size:2.4rem; font-weight:900; color:var(--white); letter-spacing:-1px; }
+    .stat .num span { color:var(--orange); }
+    .stat .label { font-size:.8rem; color:var(--gray-4); margin-top:4px; }
 
-    /* Role toggle */
-    .role-toggle { display: flex; gap: 8px; margin-bottom: 16px; }
-    .role-btn {
-      flex: 1; padding: 9px 0; border-radius: 8px; border: 1.5px solid var(--gray-4);
-      background: var(--white); font-size: .85rem; font-weight: 700; cursor: pointer;
-      transition: all .2s; color: var(--gray-3);
-    }
-    .role-btn.active-traveler { background: var(--blue-l); border-color: var(--blue); color: var(--blue); }
-    .role-btn.active-local { background: #ECFDF5; border-color: var(--green); color: var(--green); }
+    /* Sections */
+    section { padding:80px 5vw; }
+    .section-label { font-size:.8rem; font-weight:700; color:var(--blue); letter-spacing:.1em; text-transform:uppercase; margin-bottom:8px; }
+    .section-title { font-size:clamp(1.6rem,3vw,2.4rem); font-weight:900; margin-bottom:12px; }
+    .section-sub { color:var(--gray-3); max-width:540px; margin:0 auto 48px; }
+    .center { text-align:center; }
 
-    /* ── Stats ── */
-    .stats {
-      display: flex; justify-content: center; gap: 40px; flex-wrap: wrap;
-      padding: 48px 5vw; background: var(--gray-1);
-    }
-    .stat { text-align: center; }
-    .stat .num { font-size: 2.4rem; font-weight: 900; color: var(--white); letter-spacing: -1px; }
-    .stat .num span { color: var(--orange); }
-    .stat .label { font-size: .8rem; color: var(--gray-4); margin-top: 4px; }
+    /* Steps */
+    .steps { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:24px; max-width:900px; margin:0 auto; }
+    .step { background:var(--gray-5); border-radius:var(--radius); padding:28px 24px; }
+    .step-num { width:36px; height:36px; border-radius:50%; background:var(--blue); color:var(--white); font-weight:900; font-size:.9rem; display:flex; align-items:center; justify-content:center; margin-bottom:16px; }
+    .step h3 { font-size:1rem; font-weight:800; margin-bottom:8px; }
+    .step p { font-size:.875rem; color:var(--gray-3); }
+    .step .icon { font-size:2rem; margin-bottom:12px; }
 
-    /* ── Section base ── */
-    section { padding: 80px 5vw; }
-    .section-label { font-size: .8rem; font-weight: 700; color: var(--blue); letter-spacing: .1em; text-transform: uppercase; margin-bottom: 8px; }
-    .section-title { font-size: clamp(1.6rem, 3vw, 2.4rem); font-weight: 900; margin-bottom: 12px; }
-    .section-sub { color: var(--gray-3); max-width: 540px; margin: 0 auto 48px; }
-    .center { text-align: center; }
+    /* Personas */
+    .personas { display:grid; grid-template-columns:1fr 1fr; gap:24px; max-width:800px; margin:0 auto; }
+    @media(max-width:600px){ .personas{grid-template-columns:1fr;} }
+    .persona-card { border-radius:var(--radius); padding:32px 28px; }
+    .persona-card.traveler { background:var(--blue-l); border:1.5px solid rgba(26,86,219,.15); }
+    .persona-card.local   { background:#ECFDF5;     border:1.5px solid rgba(14,159,110,.15); }
+    .persona-card .p-icon { font-size:2.4rem; margin-bottom:16px; }
+    .persona-card h3 { font-size:1.1rem; font-weight:800; margin-bottom:8px; }
+    .persona-card.traveler h3 { color:var(--blue); }
+    .persona-card.local h3   { color:var(--green); }
+    .persona-card ul { list-style:none; padding:0; }
+    .persona-card ul li { font-size:.875rem; color:var(--gray-2); padding:5px 0; display:flex; gap:8px; }
+    .persona-card ul li::before { content:'✓'; font-weight:900; flex-shrink:0; }
+    .persona-card.traveler li::before { color:var(--blue); }
+    .persona-card.local   li::before { color:var(--green); }
 
-    /* ── How it works ── */
-    .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 24px; max-width: 900px; margin: 0 auto; }
-    .step {
-      background: var(--gray-5); border-radius: var(--radius);
-      padding: 28px 24px; position: relative;
-    }
-    .step-num {
-      width: 36px; height: 36px; border-radius: 50%;
-      background: var(--blue); color: var(--white);
-      font-weight: 900; font-size: .9rem;
-      display: flex; align-items: center; justify-content: center;
-      margin-bottom: 16px;
-    }
-    .step h3 { font-size: 1rem; font-weight: 800; margin-bottom: 8px; }
-    .step p { font-size: .875rem; color: var(--gray-3); }
-    .step .icon { font-size: 2rem; margin-bottom: 12px; }
+    /* Sports */
+    .sports-bg { background:var(--gray-5); }
+    .sports-grid { display:flex; flex-wrap:wrap; gap:12px; justify-content:center; max-width:700px; margin:0 auto; }
+    .sport-tag { background:var(--white); border:1.5px solid var(--gray-4); border-radius:100px; padding:8px 20px; font-size:.875rem; font-weight:700; color:var(--gray-2); display:flex; align-items:center; gap:8px; }
+    .sport-tag.phase1 { border-color:var(--blue); color:var(--blue); background:var(--blue-l); }
+    .phase-note { font-size:.78rem; color:var(--gray-3); text-align:center; margin-top:16px; }
 
-    /* ── For whom ── */
-    .personas { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; max-width: 800px; margin: 0 auto; }
-    @media (max-width: 600px) { .personas { grid-template-columns: 1fr; } }
-    .persona-card {
-      border-radius: var(--radius); padding: 32px 28px;
-    }
-    .persona-card.traveler { background: var(--blue-l); border: 1.5px solid rgba(26,86,219,.15); }
-    .persona-card.local   { background: #ECFDF5;     border: 1.5px solid rgba(14,159,110,.15); }
-    .persona-card .p-icon { font-size: 2.4rem; margin-bottom: 16px; }
-    .persona-card h3 { font-size: 1.1rem; font-weight: 800; margin-bottom: 8px; }
-    .persona-card.traveler h3 { color: var(--blue); }
-    .persona-card.local h3   { color: var(--green); }
-    .persona-card ul { list-style: none; padding: 0; }
-    .persona-card ul li { font-size: .875rem; color: var(--gray-2); padding: 5px 0; display: flex; gap: 8px; }
-    .persona-card ul li::before { content: '✓'; font-weight: 900; flex-shrink: 0; }
-    .persona-card.traveler li::before { color: var(--blue); }
-    .persona-card.local   li::before { color: var(--green); }
+    /* Safety */
+    .safety-list { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:20px; max-width:800px; margin:0 auto; }
+    .safety-item { display:flex; gap:16px; align-items:flex-start; }
+    .safety-item .s-icon { font-size:1.6rem; flex-shrink:0; margin-top:2px; }
+    .safety-item h4 { font-size:.9rem; font-weight:800; margin-bottom:4px; }
+    .safety-item p { font-size:.8rem; color:var(--gray-3); }
 
-    /* ── Sports ── */
-    .sports-bg { background: var(--gray-5); }
-    .sports-grid { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; max-width: 700px; margin: 0 auto; }
-    .sport-tag {
-      background: var(--white); border: 1.5px solid var(--gray-4);
-      border-radius: 100px; padding: 8px 20px;
-      font-size: .875rem; font-weight: 700; color: var(--gray-2);
-      display: flex; align-items: center; gap: 8px;
-    }
-    .sport-tag.phase1 { border-color: var(--blue); color: var(--blue); background: var(--blue-l); }
-    .phase-note { font-size: .78rem; color: var(--gray-3); text-align: center; margin-top: 16px; }
-    .phase-note b { color: var(--blue); }
+    /* CTA */
+    .cta-section { background:linear-gradient(135deg,var(--blue) 0%,#1239a6 100%); text-align:center; padding:80px 5vw; }
+    .cta-section h2 { color:var(--white); font-size:clamp(1.6rem,3vw,2.4rem); font-weight:900; margin-bottom:12px; }
+    .cta-section p { color:rgba(255,255,255,.8); margin-bottom:36px; }
+    .cta-section .register-box { max-width:460px; }
 
-    /* ── Safety ── */
-    .safety-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; max-width: 800px; margin: 0 auto; }
-    .safety-item { display: flex; gap: 16px; align-items: flex-start; }
-    .safety-item .s-icon { font-size: 1.6rem; flex-shrink: 0; margin-top: 2px; }
-    .safety-item h4 { font-size: .9rem; font-weight: 800; margin-bottom: 4px; }
-    .safety-item p { font-size: .8rem; color: var(--gray-3); }
+    /* FAQ */
+    .faq-list { max-width:680px; margin:0 auto; }
+    details { border-bottom:1px solid var(--gray-4); }
+    summary { padding:18px 4px; font-size:.95rem; font-weight:700; cursor:pointer; display:flex; justify-content:space-between; align-items:center; list-style:none; }
+    summary::-webkit-details-marker { display:none; }
+    summary::after { content:'+'; font-size:1.2rem; color:var(--blue); transition:transform .2s; }
+    details[open] summary::after { transform:rotate(45deg); }
+    details p { padding:0 4px 18px; color:var(--gray-3); font-size:.875rem; line-height:1.8; }
 
-    /* ── CTA section ── */
-    .cta-section {
-      background: linear-gradient(135deg, var(--blue) 0%, #1239a6 100%);
-      text-align: center; padding: 80px 5vw;
-    }
-    .cta-section h2 { color: var(--white); font-size: clamp(1.6rem, 3vw, 2.4rem); font-weight: 900; margin-bottom: 12px; }
-    .cta-section p { color: rgba(255,255,255,.8); margin-bottom: 36px; }
-    .cta-section .register-box { max-width: 460px; }
+    footer { background:var(--gray-1); color:var(--gray-4); text-align:center; padding:32px 5vw; font-size:.8rem; }
+    footer a { color:var(--gray-3); text-decoration:underline; }
 
-    /* ── FAQ ── */
-    .faq-list { max-width: 680px; margin: 0 auto; }
-    details { border-bottom: 1px solid var(--gray-4); }
-    summary {
-      padding: 18px 4px; font-size: .95rem; font-weight: 700; cursor: pointer;
-      display: flex; justify-content: space-between; align-items: center;
-      list-style: none;
-    }
-    summary::-webkit-details-marker { display: none; }
-    summary::after { content: '+'; font-size: 1.2rem; color: var(--blue); transition: transform .2s; }
-    details[open] summary::after { transform: rotate(45deg); }
-    details p { padding: 0 4px 18px; color: var(--gray-3); font-size: .875rem; line-height: 1.8; }
+    #toast { position:fixed; bottom:32px; left:50%; transform:translateX(-50%); background:var(--gray-1); color:var(--white); padding:14px 28px; border-radius:100px; font-size:.875rem; font-weight:700; box-shadow:0 8px 32px rgba(0,0,0,.2); opacity:0; pointer-events:none; z-index:9999; transition:opacity .3s; white-space:nowrap; }
+    #toast.show { opacity:1; }
+    .counter-bar { text-align:center; padding:12px; background:var(--orange); color:var(--white); font-size:.85rem; font-weight:700; }
 
-    /* ── Footer ── */
-    footer {
-      background: var(--gray-1); color: var(--gray-4);
-      text-align: center; padding: 32px 5vw; font-size: .8rem;
-    }
-    footer a { color: var(--gray-3); text-decoration: underline; }
-
-    /* ── Toast ── */
-    #toast {
-      position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%);
-      background: var(--gray-1); color: var(--white);
-      padding: 14px 28px; border-radius: 100px;
-      font-size: .875rem; font-weight: 700;
-      box-shadow: 0 8px 32px rgba(0,0,0,.2);
-      opacity: 0; pointer-events: none; z-index: 9999;
-      transition: opacity .3s;
-      white-space: nowrap;
-    }
-    #toast.show { opacity: 1; }
-
-    /* ── Counter ── */
-    .counter-bar { text-align: center; padding: 12px; background: var(--orange); color: var(--white); font-size: .85rem; font-weight: 700; }
-
-    @media (max-width: 600px) {
-      .field-group { flex-direction: column; }
-      .stats { gap: 24px; }
-    }
+    @media(max-width:600px){ .field-group{flex-direction:column;} .stats{gap:24px;} nav{padding:10px 4vw;} }
   </style>
 </head>
 <body>
 
-<!-- 緊急感バー -->
-<div class="counter-bar">
-  🎾 台中ベータ版・先着100名限定で無料登録受付中 — 残り <span id="spots">73</span> 名
-</div>
+<div class="counter-bar" id="counter-bar">🎾 台中ベータ版・先着100名限定で無料登録受付中 — 残り <span id="spots">73</span> 名</div>
 
-<!-- ── Nav ── -->
 <nav>
   <div class="logo">Play<span>mate</span></div>
-  <a href="#register" class="cta-nav">無料で事前登録</a>
+  <div class="lang-toggle">
+    <button class="lang-btn active" id="lb-ja" onclick="setLang('ja')">日</button>
+    <button class="lang-btn" id="lb-en" onclick="setLang('en')">EN</button>
+    <button class="lang-btn" id="lb-zh" onclick="setLang('zh-TW')">繁</button>
+  </div>
+  <a href="#register" class="cta-nav" data-i18n="navCta">無料で事前登録</a>
 </nav>
 
-<!-- ── Hero ── -->
+<!-- Hero -->
 <section class="hero" id="top">
-  <div class="badge">🌏 台中 先行ベータ版 事前登録受付中</div>
-  <h1>旅先でスポーツ仲間を、<br><em>今すぐ</em>見つけよう。</h1>
-  <p class="sub">
-    出張・旅行中の空き時間に、テニスやバスケの相手を地図上で即座にマッチング。
-    eKYC本人確認済みの現地パートナーと、安心してプレイできる。
-  </p>
-
+  <div class="badge" data-i18n="heroBadge">🌏 台中 先行ベータ版 事前登録受付中</div>
+  <h1 data-i18n-html="heroH1">旅先でスポーツ仲間を、<br><em>今すぐ</em>見つけよう。</h1>
+  <p class="sub" data-i18n="heroSub">出張・旅行中の空き時間に、テニスやバスケの相手を地図上で即座にマッチング。eKYC本人確認済みの現地パートナーと、安心してプレイできる。</p>
   <div class="register-box">
-    <p>あなたはどちらですか？</p>
+    <p data-i18n="registerQ">あなたはどちらですか？</p>
     <div class="role-toggle">
-      <button class="role-btn" id="btn-traveler" onclick="selectRole('traveler')">✈️ トラベラー<br><small>旅行者・出張者</small></button>
-      <button class="role-btn" id="btn-local"    onclick="selectRole('local')">🏠 ローカル<br><small>台中在住者</small></button>
+      <button class="role-btn" id="btn-traveler" onclick="selectRole('traveler')">
+        <span data-i18n="roleTravelerLabel">✈️ トラベラー</span><br><small data-i18n="roleTravelerSub">旅行者・出張者</small>
+      </button>
+      <button class="role-btn" id="btn-local" onclick="selectRole('local')">
+        <span data-i18n="roleLocalLabel">🏠 ローカル</span><br><small data-i18n="roleLocalSub">台中在住者</small>
+      </button>
     </div>
-    <p id="role-desc" style="color:#6B7280;font-size:.82rem;margin-bottom:14px;">
-      役割を選ぶと登録フォームが表示されます
-    </p>
+    <p id="role-desc" style="color:#6B7280;font-size:.82rem;margin-bottom:14px;" data-i18n="rolePrompt">役割を選ぶと登録フォームが表示されます</p>
     <div class="field-group" id="reg-form" style="display:none">
-      <input type="email" id="email-hero" placeholder="メールアドレスを入力" autocomplete="email">
-      <button class="btn-register" onclick="register('hero')">無料登録</button>
+      <input type="email" id="email-hero" data-i18n-ph="emailPlaceholder" placeholder="メールアドレスを入力" autocomplete="email">
+      <button class="btn-register" data-i18n="registerBtn" onclick="register('hero')">無料登録</button>
     </div>
-    <p class="micro" id="micro-hero" style="display:none">
-      スパムは送りません。リリース時にのみご連絡します。
-    </p>
+    <p class="micro" id="micro-hero" style="display:none" data-i18n="registerMicro">スパムは送りません。リリース時にのみご連絡します。</p>
   </div>
 </section>
 
-<!-- ── Stats ── -->
+<!-- Stats -->
 <div class="stats">
-  <div class="stat"><div class="num">2<span>min</span></div><div class="label">マッチングにかかる平均時間（想定）</div></div>
-  <div class="stat"><div class="num">0<span>円</span></div><div class="label">ベータ版は完全無料</div></div>
-  <div class="stat"><div class="num">100<span>%</span></div><div class="label">eKYC本人確認済みユーザー</div></div>
+  <div class="stat"><div class="num" data-i18n="stat1num">2<span>min</span></div><div class="label" data-i18n="stat1label">マッチングにかかる平均時間（想定）</div></div>
+  <div class="stat"><div class="num" data-i18n="stat2num">0<span>円</span></div><div class="label" data-i18n="stat2label">ベータ版は完全無料</div></div>
+  <div class="stat"><div class="num">100<span>%</span></div><div class="label" data-i18n="stat3label">eKYC本人確認済みユーザー</div></div>
 </div>
 
-<!-- ── How it works ── -->
+<!-- How it works -->
 <section class="center">
-  <div class="section-label">How it works</div>
-  <h2 class="section-title">たった3ステップ</h2>
-  <p class="section-sub">アプリを開いたその日から、旅先でスポーツ仲間が見つかる。</p>
+  <div class="section-label" data-i18n="howLabel">How it works</div>
+  <h2 class="section-title" data-i18n="howTitle">たった3ステップ</h2>
+  <p class="section-sub" data-i18n="howSub">アプリを開いたその日から、旅先でスポーツ仲間が見つかる。</p>
   <div class="steps">
-    <div class="step">
-      <div class="step-num">1</div>
-      <div class="icon">🗺️</div>
-      <h3>地図を開く</h3>
-      <p>現在地周辺のスポーツコートやアクティビティのピンが地図上に表示される。</p>
-    </div>
-    <div class="step">
-      <div class="step-num">2</div>
-      <div class="icon">👤</div>
-      <h3>相手を選ぶ</h3>
-      <p>スキル・対応言語・評価・費用分担方法を確認してマッチングリクエストを送る。</p>
-    </div>
-    <div class="step">
-      <div class="step-num">3</div>
-      <div class="icon">🎾</div>
-      <h3>プレイする</h3>
-      <p>合意したら当日コートへ。プレイ後はお互いをレビューして信頼スコアを積み上げる。</p>
-    </div>
+    <div class="step"><div class="step-num">1</div><div class="icon">🗺️</div><h3 data-i18n="step1title">地図を開く</h3><p data-i18n="step1body">現在地周辺のスポーツコートやアクティビティのピンが地図上に表示される。</p></div>
+    <div class="step"><div class="step-num">2</div><div class="icon">👤</div><h3 data-i18n="step2title">相手を選ぶ</h3><p data-i18n="step2body">スキル・対応言語・評価・費用分担方法を確認してマッチングリクエストを送る。</p></div>
+    <div class="step"><div class="step-num">3</div><div class="icon">🎾</div><h3 data-i18n="step3title">プレイする</h3><p data-i18n="step3body">合意したら当日コートへ。プレイ後はお互いをレビューして信頼スコアを積み上げる。</p></div>
   </div>
 </section>
 
-<!-- ── For whom ── -->
+<!-- For whom -->
 <section class="center" style="background:#fff;">
-  <div class="section-label">Who it's for</div>
-  <h2 class="section-title">こんな人に使ってほしい</h2>
-  <p class="section-sub"></p>
+  <div class="section-label" data-i18n="whoLabel">Who it's for</div>
+  <h2 class="section-title" data-i18n="whoTitle">こんな人に使ってほしい</h2>
   <div class="personas">
     <div class="persona-card traveler">
       <div class="p-icon">✈️</div>
-      <h3>トラベラー</h3>
-      <ul>
+      <h3 data-i18n="travelerTitle">トラベラー</h3>
+      <ul id="traveler-list">
         <li>出張の夜・週末に体を動かしたい</li>
         <li>現地のリアルな生活を体験したい</li>
         <li>テニスラケットを持って来たが相手がいない</li>
@@ -332,8 +199,8 @@
     </div>
     <div class="persona-card local">
       <div class="p-icon">🏠</div>
-      <h3>ローカル</h3>
-      <ul>
+      <h3 data-i18n="localTitle">ローカル</h3>
+      <ul id="local-list">
         <li>いつものメンバーが揃わない時に人数合わせしたい</li>
         <li>外国人との交流・語学練習に興味がある</li>
         <li>コート代を割り勘できる相手を探している</li>
@@ -343,226 +210,365 @@
   </div>
 </section>
 
-<!-- ── Sports ── -->
+<!-- Sports -->
 <section class="center sports-bg">
-  <div class="section-label">Sports & Activities</div>
-  <h2 class="section-title">対応スポーツ・趣味</h2>
-  <p class="section-sub">ベータ版では「相手がいないと成立しない」スポーツから開始します。</p>
+  <div class="section-label" data-i18n="sportsLabel">Sports & Activities</div>
+  <h2 class="section-title" data-i18n="sportsTitle">対応スポーツ・趣味</h2>
+  <p class="section-sub" data-i18n="sportsSub">ベータ版では「相手がいないと成立しない」スポーツから開始します。</p>
   <div class="sports-grid">
-    <div class="sport-tag phase1">🎾 テニス</div>
-    <div class="sport-tag phase1">🏸 バドミントン</div>
-    <div class="sport-tag phase1">🏀 バスケットボール</div>
-    <div class="sport-tag phase1">🏓 卓球</div>
-    <div class="sport-tag phase1">🎾 パデル</div>
-    <div class="sport-tag">⛳ ゴルフ</div>
-    <div class="sport-tag">🎱 ビリヤード</div>
-    <div class="sport-tag">🎯 ダーツ</div>
-    <div class="sport-tag">♟️ ボードゲーム</div>
-    <div class="sport-tag">🏃 ランニング</div>
+    <div class="sport-tag phase1">🎾 <span data-i18n="sp-tennis">テニス</span></div>
+    <div class="sport-tag phase1">🏸 <span data-i18n="sp-badminton">バドミントン</span></div>
+    <div class="sport-tag phase1">🏀 <span data-i18n="sp-basketball">バスケットボール</span></div>
+    <div class="sport-tag phase1">🏓 <span data-i18n="sp-tabletennis">卓球</span></div>
+    <div class="sport-tag phase1">🥎 <span data-i18n="sp-padel">パデル</span></div>
+    <div class="sport-tag">⛳ <span data-i18n="sp-golf">ゴルフ</span></div>
+    <div class="sport-tag">🎱 <span data-i18n="sp-billiards">ビリヤード</span></div>
+    <div class="sport-tag">🎯 <span data-i18n="sp-darts">ダーツ</span></div>
+    <div class="sport-tag">♟️ <span data-i18n="sp-boardgame">ボードゲーム</span></div>
+    <div class="sport-tag">🏃 <span data-i18n="sp-running">ランニング</span></div>
   </div>
-  <p class="phase-note"><b>青色</b>がベータ版の対象。順次拡大予定。</p>
+  <p class="phase-note" data-i18n-html="sportsNote"><b>青色</b>がベータ版の対象。順次拡大予定。</p>
 </section>
 
-<!-- ── Safety ── -->
+<!-- Safety -->
 <section class="center">
-  <div class="section-label">Trust & Safety</div>
-  <h2 class="section-title">知らない土地でも安心できる設計</h2>
-  <p class="section-sub">旅先での初対面だからこそ、安全性は最優先。</p>
+  <div class="section-label" data-i18n="safetyLabel">Trust & Safety</div>
+  <h2 class="section-title" data-i18n="safetyTitle">知らない土地でも安心できる設計</h2>
+  <p class="section-sub" data-i18n="safetySub">旅先での初対面だからこそ、安全性は最優先。</p>
   <div class="safety-list">
-    <div class="safety-item">
-      <div class="s-icon">🪪</div>
-      <div>
-        <h4>eKYC 本人確認必須</h4>
-        <p>パスポート・免許証を用いた本人確認が全ユーザーに必要。匿名ユーザーはゼロ。</p>
-      </div>
-    </div>
-    <div class="safety-item">
-      <div class="s-icon">⭐</div>
-      <div>
-        <h4>相互レビューシステム</h4>
-        <p>マナー・スキル・コミュニケーションを5段階評価。低評価が続くと利用制限。</p>
-      </div>
-    </div>
-    <div class="safety-item">
-      <div class="s-icon">💰</div>
-      <div>
-        <h4>費用分担を事前合意</h4>
-        <p>割り勘・ゲストおごり・ホストおごりを事前に設定。当日のお金トラブルなし。</p>
-      </div>
-    </div>
-    <div class="safety-item">
-      <div class="s-icon">🌐</div>
-      <div>
-        <h4>言語フィルター</h4>
-        <p>「日本語OK」「英語のみ」など対応言語で検索。言語の壁を事前に解消。</p>
-      </div>
-    </div>
+    <div class="safety-item"><div class="s-icon">🪪</div><div><h4 data-i18n="safe1title">eKYC 本人確認必須</h4><p data-i18n="safe1body">パスポート・免許証を用いた本人確認が全ユーザーに必要。匿名ユーザーはゼロ。</p></div></div>
+    <div class="safety-item"><div class="s-icon">⭐</div><div><h4 data-i18n="safe2title">相互レビューシステム</h4><p data-i18n="safe2body">マナー・スキル・コミュニケーションを5段階評価。低評価が続くと利用制限。</p></div></div>
+    <div class="safety-item"><div class="s-icon">💰</div><div><h4 data-i18n="safe3title">費用分担を事前合意</h4><p data-i18n="safe3body">割り勘・ゲストおごり・ホストおごりを事前に設定。当日のお金トラブルなし。</p></div></div>
+    <div class="safety-item"><div class="s-icon">🌐</div><div><h4 data-i18n="safe4title">言語フィルター</h4><p data-i18n="safe4body">「日本語OK」「英語のみ」など対応言語で検索。言語の壁を事前に解消。</p></div></div>
   </div>
 </section>
 
-<!-- ── CTA ── -->
+<!-- CTA -->
 <section class="cta-section" id="register">
-  <h2>今すぐ無料で事前登録する</h2>
-  <p>台中ベータ版のリリース時に最優先でご案内します。先着100名限定。</p>
+  <h2 data-i18n="ctaTitle">今すぐ無料で事前登録する</h2>
+  <p data-i18n="ctaSub">台中ベータ版のリリース時に最優先でご案内します。先着100名限定。</p>
   <div class="register-box" style="margin:0 auto;">
-    <p>あなたはどちらですか？</p>
+    <p data-i18n="registerQ">あなたはどちらですか？</p>
     <div class="role-toggle">
-      <button class="role-btn" id="btn-traveler2" onclick="selectRole2('traveler')">✈️ トラベラー</button>
-      <button class="role-btn" id="btn-local2"    onclick="selectRole2('local')">🏠 ローカル</button>
+      <button class="role-btn" id="btn-traveler2" onclick="selectRole2('traveler')"><span data-i18n="roleTravelerLabel">✈️ トラベラー</span></button>
+      <button class="role-btn" id="btn-local2"    onclick="selectRole2('local')"><span data-i18n="roleLocalLabel">🏠 ローカル</span></button>
     </div>
     <div class="field-group" id="reg-form2" style="display:none">
-      <input type="email" id="email-cta" placeholder="メールアドレスを入力" autocomplete="email">
-      <button class="btn-register" onclick="register('cta')">無料登録</button>
+      <input type="email" id="email-cta" data-i18n-ph="emailPlaceholder" placeholder="メールアドレスを入力" autocomplete="email">
+      <button class="btn-register" data-i18n="registerBtn" onclick="register('cta')">無料登録</button>
     </div>
-    <p class="micro" id="micro-cta" style="display:none">
-      スパムは送りません。リリース時にのみご連絡します。
-    </p>
+    <p class="micro" id="micro-cta" style="display:none" data-i18n="registerMicro">スパムは送りません。リリース時にのみご連絡します。</p>
   </div>
 </section>
 
-<!-- ── FAQ ── -->
+<!-- FAQ -->
 <section>
-  <div class="section-label" style="text-align:center">FAQ</div>
-  <h2 class="section-title center">よくある質問</h2>
+  <div class="section-label" style="text-align:center" data-i18n="faqLabel">FAQ</div>
+  <h2 class="section-title center" data-i18n="faqTitle">よくある質問</h2>
   <div style="height:32px"></div>
   <div class="faq-list">
-    <details>
-      <summary>ベータ版は本当に無料ですか？</summary>
-      <p>はい。台中ベータ版の期間中は完全無料でご利用いただけます。正式リリース後の料金プランは事前登録者に最初にお知らせします。</p>
-    </details>
-    <details>
-      <summary>どの国・地域の人でも登録できますか？</summary>
-      <p>はい。台中を訪れるすべての旅行者・出張者と、台中在住の方が対象です。対応言語は日本語・英語・繁体字中国語を予定しています。</p>
-    </details>
-    <details>
-      <summary>スポーツ施設の予約もアプリでできますか？</summary>
-      <p>ベータ版ではマッチング機能に集中します。施設予約との連携は将来的なロードマップに含まれており、ご要望が多い機能を優先的に開発します。</p>
-    </details>
-    <details>
-      <summary>女性一人でも安全に使えますか？</summary>
-      <p>全ユーザーにeKYC本人確認を必須とし、相互レビューと通報機能を設けます。また、プロフィールには性別・年齢層・対応言語が明示されるため、事前に相手の情報を十分確認してからマッチングできます。</p>
-    </details>
-    <details>
-      <summary>ラケットなどの道具がなくてもOKですか？</summary>
-      <p>募集ピンには「道具貸出可能」フラグが表示されます。現地ユーザーが道具を持っている場合は貸出条件も事前に確認できます。</p>
-    </details>
-    <details>
-      <summary>当日キャンセルはどうなりますか？</summary>
-      <p>ベータ版ではキャンセルポリシーの詳細を検討中です。事前登録者のフィードバックをもとに最も公平なルールを設計します。ご意見をぜひお聞かせください。</p>
-    </details>
+    <details><summary data-i18n="faq1q">ベータ版は本当に無料ですか？</summary><p data-i18n="faq1a">はい。台中ベータ版の期間中は完全無料でご利用いただけます。正式リリース後の料金プランは事前登録者に最初にお知らせします。</p></details>
+    <details><summary data-i18n="faq2q">どの国・地域の人でも登録できますか？</summary><p data-i18n="faq2a">はい。台中を訪れるすべての旅行者・出張者と、台中在住の方が対象です。対応言語は日本語・英語・繁体字中国語を予定しています。</p></details>
+    <details><summary data-i18n="faq3q">スポーツ施設の予約もアプリでできますか？</summary><p data-i18n="faq3a">ベータ版ではマッチング機能に集中します。施設予約との連携は将来的なロードマップに含まれており、ご要望が多い機能を優先的に開発します。</p></details>
+    <details><summary data-i18n="faq4q">女性一人でも安全に使えますか？</summary><p data-i18n="faq4a">全ユーザーにeKYC本人確認を必須とし、相互レビューと通報機能を設けます。プロフィールには性別・年齢層・対応言語が明示されるため、事前に相手の情報を十分確認してからマッチングできます。</p></details>
+    <details><summary data-i18n="faq5q">ラケットなどの道具がなくてもOKですか？</summary><p data-i18n="faq5a">募集ピンには「道具貸出可能」フラグが表示されます。現地ユーザーが道具を持っている場合は貸出条件も事前に確認できます。</p></details>
+    <details><summary data-i18n="faq6q">当日キャンセルはどうなりますか？</summary><p data-i18n="faq6a">ベータ版ではキャンセルポリシーの詳細を検討中です。事前登録者のフィードバックをもとに最も公平なルールを設計します。ご意見をぜひお聞かせください。</p></details>
   </div>
 </section>
 
-<!-- ── Footer ── -->
 <footer>
-  <p style="margin-bottom:8px">© 2025 Playmate Beta — 台中先行版</p>
-  <p>ご質問・パートナーシップのご相談は <a href="mailto:hello@playmate-app.example">hello@playmate-app.example</a> まで</p>
+  <p style="margin-bottom:8px" data-i18n="footerCopy">© 2025 Playmate Beta — 台中先行版</p>
+  <p><span data-i18n="footerContact">ご質問・パートナーシップのご相談は</span> <a href="mailto:hello@playmate-app.example">hello@playmate-app.example</a></p>
 </footer>
 
-<!-- Toast -->
-<div id="toast">✅ 登録完了！リリース時にご連絡します。</div>
+<div id="toast"></div>
 
 <script>
-  let selectedRole = null;
-  let selectedRole2 = null;
-  let spots = 73;
-
-  // 残り枠を少しずつ減らしてリアル感を出す（デモ用）
-  function animateSpots() {
-    const el = document.getElementById('spots');
-    if (spots > 60 && Math.random() < 0.3) {
-      spots--;
-      el.textContent = spots;
-    }
-    setTimeout(animateSpots, 8000 + Math.random() * 12000);
+// ── Translations ──────────────────────────────────────────
+const T = {
+  ja: {
+    navCta:'無料で事前登録',
+    heroBadge:'🌏 台中 先行ベータ版 事前登録受付中',
+    heroH1:'旅先でスポーツ仲間を、<br><em>今すぐ</em>見つけよう。',
+    heroSub:'出張・旅行中の空き時間に、テニスやバスケの相手を地図上で即座にマッチング。eKYC本人確認済みの現地パートナーと、安心してプレイできる。',
+    registerQ:'あなたはどちらですか？',
+    roleTravelerLabel:'✈️ トラベラー', roleTravelerSub:'旅行者・出張者',
+    roleLocalLabel:'🏠 ローカル', roleLocalSub:'台中在住者',
+    rolePrompt:'役割を選ぶと登録フォームが表示されます',
+    registerBtn:'無料登録', registerMicro:'スパムは送りません。リリース時にのみご連絡します。',
+    emailPlaceholder:'メールアドレスを入力', registerBtnLoading:'登録中…',
+    stat1num:'2min', stat1label:'マッチングにかかる平均時間（想定）',
+    stat2num:'0円', stat2label:'ベータ版は完全無料',
+    stat3label:'eKYC本人確認済みユーザー',
+    howLabel:'How it works', howTitle:'たった3ステップ',
+    howSub:'アプリを開いたその日から、旅先でスポーツ仲間が見つかる。',
+    step1title:'地図を開く', step1body:'現在地周辺のスポーツコートやアクティビティのピンが地図上に表示される。',
+    step2title:'相手を選ぶ', step2body:'スキル・対応言語・評価・費用分担方法を確認してマッチングリクエストを送る。',
+    step3title:'プレイする', step3body:'合意したら当日コートへ。プレイ後はお互いをレビューして信頼スコアを積み上げる。',
+    whoLabel:"Who it's for", whoTitle:'こんな人に使ってほしい',
+    travelerTitle:'トラベラー',
+    travelerItems:['出張の夜・週末に体を動かしたい','現地のリアルな生活を体験したい','テニスラケットを持って来たが相手がいない','観光だけでなく現地の人と繋がりたい'],
+    localTitle:'ローカル',
+    localItems:['いつものメンバーが揃わない時に人数合わせしたい','外国人との交流・語学練習に興味がある','コート代を割り勘できる相手を探している','台中をもっと好きになってもらいたい'],
+    sportsLabel:'Sports & Activities', sportsTitle:'対応スポーツ・趣味',
+    sportsSub:'ベータ版では「相手がいないと成立しない」スポーツから開始します。',
+    sportsNote:'<b>青色</b>がベータ版の対象。順次拡大予定。',
+    'sp-tennis':'テニス','sp-badminton':'バドミントン','sp-basketball':'バスケットボール',
+    'sp-tabletennis':'卓球','sp-padel':'パデル','sp-golf':'ゴルフ',
+    'sp-billiards':'ビリヤード','sp-darts':'ダーツ','sp-boardgame':'ボードゲーム','sp-running':'ランニング',
+    safetyLabel:'Trust & Safety', safetyTitle:'知らない土地でも安心できる設計',
+    safetySub:'旅先での初対面だからこそ、安全性は最優先。',
+    safe1title:'eKYC 本人確認必須', safe1body:'パスポート・免許証を用いた本人確認が全ユーザーに必要。匿名ユーザーはゼロ。',
+    safe2title:'相互レビューシステム', safe2body:'マナー・スキル・コミュニケーションを5段階評価。低評価が続くと利用制限。',
+    safe3title:'費用分担を事前合意', safe3body:'割り勘・ゲストおごり・ホストおごりを事前に設定。当日のお金トラブルなし。',
+    safe4title:'言語フィルター', safe4body:'「日本語OK」「英語のみ」など対応言語で検索。言語の壁を事前に解消。',
+    ctaTitle:'今すぐ無料で事前登録する', ctaSub:'台中ベータ版のリリース時に最優先でご案内します。先着100名限定。',
+    faqLabel:'FAQ', faqTitle:'よくある質問',
+    faq1q:'ベータ版は本当に無料ですか？', faq1a:'はい。台中ベータ版の期間中は完全無料でご利用いただけます。正式リリース後の料金プランは事前登録者に最初にお知らせします。',
+    faq2q:'どの国・地域の人でも登録できますか？', faq2a:'はい。台中を訪れるすべての旅行者・出張者と、台中在住の方が対象です。対応言語は日本語・英語・繁体字中国語を予定しています。',
+    faq3q:'スポーツ施設の予約もアプリでできますか？', faq3a:'ベータ版ではマッチング機能に集中します。施設予約との連携は将来的なロードマップに含まれており、ご要望が多い機能を優先的に開発します。',
+    faq4q:'女性一人でも安全に使えますか？', faq4a:'全ユーザーにeKYC本人確認を必須とし、相互レビューと通報機能を設けます。プロフィールには性別・年齢層・対応言語が明示されるため、事前に相手の情報を十分確認してからマッチングできます。',
+    faq5q:'ラケットなどの道具がなくてもOKですか？', faq5a:'募集ピンには「道具貸出可能」フラグが表示されます。現地ユーザーが道具を持っている場合は貸出条件も事前に確認できます。',
+    faq6q:'当日キャンセルはどうなりますか？', faq6a:'ベータ版ではキャンセルポリシーの詳細を検討中です。事前登録者のフィードバックをもとに最も公平なルールを設計します。ご意見をぜひお聞かせください。',
+    footerCopy:'© 2025 Playmate Beta — 台中先行版', footerContact:'ご質問・パートナーシップのご相談は',
+    roleDescTraveler:'✈️ 旅行・出張先でスポーツ仲間を見つけたい方',
+    roleDescLocal:'🏠 台中在住で旅行者と交流したい方',
+    toastSuccess:'✅ 登録完了！リリース時にご連絡します。',
+    toastNoRole:'⚠️ トラベラー or ローカルを選んでください',
+    toastNoEmail:'⚠️ 正しいメールアドレスを入力してください',
+    toastError:'⚠️ 登録に失敗しました。もう一度お試しください。',
+    counterBar:'🎾 台中ベータ版・先着100名限定で無料登録受付中 — 残り {n} 名',
+  },
+  en: {
+    navCta:'Sign up free',
+    heroBadge:'🌏 Taichung Beta — Early access sign-ups open',
+    heroH1:'Find a sports partner in your travel city, <em>right now.</em>',
+    heroSub:"Instantly match with local partners for tennis, basketball, and more — right from the map. Every user is eKYC-verified so you can play with confidence.",
+    registerQ:'Who are you?',
+    roleTravelerLabel:'✈️ Traveler', roleTravelerSub:'Tourist / Business traveler',
+    roleLocalLabel:'🏠 Local', roleLocalSub:'Taichung resident',
+    rolePrompt:'Select your role to show the sign-up form',
+    registerBtn:'Sign up free', registerMicro:"No spam. We'll only contact you at launch.",
+    emailPlaceholder:'Enter your email address', registerBtnLoading:'Signing up…',
+    stat1num:'2min', stat1label:'Avg. time to find a match (estimated)',
+    stat2num:'$0', stat2label:'Beta is completely free',
+    stat3label:'eKYC-verified users',
+    howLabel:'How it works', howTitle:'Just 3 steps',
+    howSub:'From the moment you open the app, you can find a sports partner in your travel city.',
+    step1title:'Open the map', step1body:'Sport activity pins appear around your location — tennis, basketball, badminton and more.',
+    step2title:'Pick a partner', step2body:'Check skill level, language, rating, and cost-sharing method. Send a match request.',
+    step3title:'Play!', step3body:'Head to the court. After playing, review each other to build trust scores.',
+    whoLabel:"Who it's for", whoTitle:'Made for you if…',
+    travelerTitle:'Traveler',
+    travelerItems:['You want to stay active during business trips or travel','You want to experience real local life, not just sightseeing','You brought your racket but have no one to play with','You want to connect with locals beyond tourist spots'],
+    localTitle:'Local',
+    localItems:["Your usual crew is short on players",'You enjoy meeting international visitors','You want to split the court fee with someone','You want travelers to fall in love with Taichung'],
+    sportsLabel:'Sports & Activities', sportsTitle:'Supported sports',
+    sportsSub:'Beta launches with sports that require a partner to play.',
+    sportsNote:'<b>Blue</b> = available in beta. More coming soon.',
+    'sp-tennis':'Tennis','sp-badminton':'Badminton','sp-basketball':'Basketball',
+    'sp-tabletennis':'Table Tennis','sp-padel':'Padel','sp-golf':'Golf',
+    'sp-billiards':'Billiards','sp-darts':'Darts','sp-boardgame':'Board Games','sp-running':'Running',
+    safetyLabel:'Trust & Safety', safetyTitle:'Safe to play with strangers in a new city',
+    safetySub:'Safety comes first when meeting someone new in a foreign city.',
+    safe1title:'Mandatory eKYC', safe1body:'Passport or ID verification is required for all users. Zero anonymous accounts.',
+    safe2title:'Mutual review system', safe2body:'Rate each other on manner, skill, and communication. Poor ratings lead to restrictions.',
+    safe3title:'Cost agreed upfront', safe3body:'Split, guest pays, or host pays — set before matching. No awkward money talk on the day.',
+    safe4title:'Language filter', safe4body:'"Japanese OK," "English only," etc. Know before you go.',
+    ctaTitle:'Sign up free — Taichung Beta', ctaSub:'Get priority access when we launch. First 100 spots only.',
+    faqLabel:'FAQ', faqTitle:'Frequently asked questions',
+    faq1q:'Is the beta really free?', faq1a:"Yes. The Taichung beta is completely free. We'll notify early sign-ups first about pricing when we officially launch.",
+    faq2q:'Can anyone from any country sign up?', faq2a:"Yes. All travelers visiting Taichung and Taichung residents are welcome. The app will support Japanese, English, and Traditional Chinese.",
+    faq3q:'Can I book sports facilities through the app?', faq3a:"The beta focuses on matching. Facility booking integration is on our roadmap and will be prioritized based on user demand.",
+    faq4q:'Is it safe for solo female travelers?', faq4a:'All users must complete eKYC verification. Mutual reviews and reporting tools are built in. Profiles show gender, age range, and language — so you can verify before committing.',
+    faq5q:"What if I don't have equipment?", faq5a:'Listings show a "Gear available" flag when locals can lend equipment. You can filter by this.',
+    faq6q:'What happens with day-of cancellations?', faq6a:"Cancellation policy details are still being designed. We'll work with early sign-ups to create the fairest rules.",
+    footerCopy:'© 2025 Playmate Beta — Taichung Early Access', footerContact:'Questions or partnership inquiries:',
+    roleDescTraveler:'✈️ Looking for sports partners during your trip',
+    roleDescLocal:'🏠 Taichung local who wants to meet travelers',
+    toastSuccess:"✅ Registered! We'll be in touch at launch.",
+    toastNoRole:'⚠️ Please select Traveler or Local',
+    toastNoEmail:'⚠️ Please enter a valid email address',
+    toastError:'⚠️ Registration failed. Please try again.',
+    counterBar:'🎾 Taichung Beta — Free sign-ups, first 100 spots only — {n} left',
+  },
+  'zh-TW': {
+    navCta:'免費預約報名',
+    heroBadge:'🌏 台中 搶先體驗版・預約報名進行中',
+    heroH1:'在旅行目的地找到運動夥伴，<em>就是現在。</em>',
+    heroSub:'出差、旅行途中，在地圖上即時配對網球、籃球等現地運動夥伴。所有用戶均通過eKYC身份驗證，安心出發。',
+    registerQ:'您是哪種用戶？',
+    roleTravelerLabel:'✈️ 旅行者', roleTravelerSub:'觀光客／商務旅客',
+    roleLocalLabel:'🏠 本地居民', roleLocalSub:'台中在住者',
+    rolePrompt:'請選擇您的身份以顯示報名表單',
+    registerBtn:'免費報名', registerMicro:'不會發送垃圾郵件，僅在上線時通知您。',
+    emailPlaceholder:'輸入電子郵件地址', registerBtnLoading:'報名中…',
+    stat1num:'2分鐘', stat1label:'預計平均配對時間',
+    stat2num:'免費', stat2label:'Beta版完全免費',
+    stat3label:'已通過eKYC實名認證',
+    howLabel:'使用流程', howTitle:'只需3個步驟',
+    howSub:'開啟App的當天，就能在旅行目的地找到運動夥伴。',
+    step1title:'打開地圖', step1body:'您所在位置附近的運動場地與活動圖釘會顯示在地圖上。',
+    step2title:'選擇夥伴', step2body:'確認對方的技術程度、可溝通語言、評價及費用分擔方式，發送配對請求。',
+    step3title:'一起運動！', step3body:'雙方同意後前往場地。運動結束後互相評價，累積信任分數。',
+    whoLabel:'適合對象', whoTitle:'如果您是以下這樣的人',
+    travelerTitle:'旅行者',
+    travelerItems:['出差或旅行期間想要保持運動習慣','想體驗真實的在地生活','帶了球拍來但找不到對手','不只想觀光，也想認識當地人'],
+    localTitle:'本地居民',
+    localItems:['老朋友湊不齊人，需要補位夥伴','對與外國人交流或語言練習有興趣','想找人分攤場地費','想讓旅行者愛上台中'],
+    sportsLabel:'運動項目', sportsTitle:'支援的運動與活動',
+    sportsSub:'Beta版從「沒有對手就無法進行」的運動項目開始。',
+    sportsNote:'<b>藍色</b>為Beta版支援項目，後續將持續擴充。',
+    'sp-tennis':'網球','sp-badminton':'羽毛球','sp-basketball':'籃球',
+    'sp-tabletennis':'桌球','sp-padel':'匹球','sp-golf':'高爾夫',
+    'sp-billiards':'撞球','sp-darts':'飛鏢','sp-boardgame':'桌遊','sp-running':'跑步',
+    safetyLabel:'信任與安全', safetyTitle:'在陌生城市也能安心配對',
+    safetySub:'在旅行途中與陌生人見面，安全是第一優先。',
+    safe1title:'強制eKYC身份驗證', safe1body:'所有用戶均須以護照或駕照完成實名認證，無匿名用戶。',
+    safe2title:'雙向評價系統', safe2body:'運動結束後，雙方可對禮儀、技術、溝通進行5星評價。低評價用戶將受到限制。',
+    safe3title:'費用事先確認', safe3body:'平均分攤、客人付費或主辦方付費，在配對前即可設定，杜絕當天費用糾紛。',
+    safe4title:'語言篩選', safe4body:'可篩選「可說日語」「僅限英語」等語言條件，出發前就能確認溝通無障礙。',
+    ctaTitle:'立即免費預約報名', ctaSub:'台中Beta版上線時將優先通知您，限前100名。',
+    faqLabel:'常見問題', faqTitle:'常見問題',
+    faq1q:'Beta版真的免費嗎？', faq1a:'是的。台中Beta版期間完全免費使用。正式上線後的收費方案將優先通知預約報名者。',
+    faq2q:'任何國家的人都可以報名嗎？', faq2a:'是的。所有造訪台中的旅行者及台中在住者均可使用。App支援日語、英語及繁體中文。',
+    faq3q:'可以透過App預訂運動設施嗎？', faq3a:'Beta版專注於配對功能。設施預訂整合已列入開發路線圖，將根據用戶需求優先開發。',
+    faq4q:'女性單獨使用安全嗎？', faq4a:'所有用戶均需完成eKYC驗證，並設有雙向評價與檢舉功能。個人檔案會顯示性別、年齡層及溝通語言，您可在配對前充分確認對方資訊。',
+    faq5q:'沒有器材也沒關係嗎？', faq5a:'招募貼文上會標示「可借用器材」旗標，用戶可事先確認。',
+    faq6q:'當天取消怎麼處理？', faq6a:'取消政策細節仍在規劃中，我們將依據預約報名者的意見制定最公平的規則。歡迎提供您的想法。',
+    footerCopy:'© 2025 Playmate Beta — 台中搶先體驗版', footerContact:'如有疑問或合作洽詢請聯繫',
+    roleDescTraveler:'✈️ 在旅行或出差途中尋找運動夥伴',
+    roleDescLocal:'🏠 希望與旅行者交流的台中在住者',
+    toastSuccess:'✅ 報名成功！上線時將通知您。',
+    toastNoRole:'⚠️ 請選擇旅行者或本地居民',
+    toastNoEmail:'⚠️ 請輸入有效的電子郵件地址',
+    toastError:'⚠️ 報名失敗，請再試一次。',
+    counterBar:'🎾 台中Beta版・限前100名免費報名 — 剩餘 {n} 個名額',
   }
-  setTimeout(animateSpots, 15000);
+};
 
-  function selectRole(role) {
-    selectedRole = role;
-    const bt = document.getElementById('btn-traveler');
-    const bl = document.getElementById('btn-local');
-    const desc = document.getElementById('role-desc');
-    bt.className = 'role-btn' + (role === 'traveler' ? ' active-traveler' : '');
-    bl.className = 'role-btn' + (role === 'local'    ? ' active-local'    : '');
-    document.getElementById('reg-form').style.display = 'flex';
-    document.getElementById('micro-hero').style.display = 'block';
-    if (role === 'traveler') desc.textContent = '✈️ 旅行・出張先でスポーツ仲間を見つけたい方';
-    else                     desc.textContent = '🏠 台中在住で旅行者と交流したい方';
-  }
+// ── i18n engine ───────────────────────────────────────────
+let currentLang = localStorage.getItem('pm-lang') || 'ja';
+let spots = 73;
 
-  function selectRole2(role) {
-    selectedRole2 = role;
-    const bt = document.getElementById('btn-traveler2');
-    const bl = document.getElementById('btn-local2');
-    bt.className = 'role-btn' + (role === 'traveler' ? ' active-traveler' : '');
-    bl.className = 'role-btn' + (role === 'local'    ? ' active-local'    : '');
-    document.getElementById('reg-form2').style.display = 'flex';
-    document.getElementById('micro-cta').style.display = 'block';
-  }
+function setLang(lang) {
+  currentLang = lang;
+  localStorage.setItem('pm-lang', lang);
+  document.documentElement.lang = lang === 'zh-TW' ? 'zh-TW' : lang;
 
-  function showToast(msg) {
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 3500);
-  }
-
-  const SUPABASE_URL = 'https://fdgyloydctrcwpompaoq.supabase.co';
-  const SUPABASE_KEY = 'sb_publishable_zIsHFRSUtPScBmb080mYIQ_WkQ0hrOW';
-
-  async function register(source) {
-    const role = source === 'hero' ? selectedRole : selectedRole2;
-    const emailEl = document.getElementById(source === 'hero' ? 'email-hero' : 'email-cta');
-    const email = emailEl.value.trim();
-
-    if (!role) { showToast('⚠️ トラベラー or ローカルを選んでください'); return; }
-    if (!email || !email.includes('@')) { showToast('⚠️ 正しいメールアドレスを入力してください'); return; }
-
-    const btn = emailEl.closest('.field-group').querySelector('.btn-register');
-    btn.disabled = true;
-    btn.textContent = '登録中…';
-
-    try {
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/registrations`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': SUPABASE_KEY,
-          'Authorization': `Bearer ${SUPABASE_KEY}`,
-          'Prefer': 'return=minimal',
-        },
-        body: JSON.stringify({ email, role, source }),
-      });
-
-      if (!res.ok) throw new Error(res.status);
-
-      if (spots > 0) {
-        spots--;
-        document.getElementById('spots').textContent = spots;
-      }
-      emailEl.value = '';
-      showToast('✅ 登録完了！リリース時にご連絡します。');
-
-      if (typeof gtag !== 'undefined') {
-        gtag('event', 'sign_up', { method: 'email', role, source });
-      }
-    } catch (e) {
-      showToast('⚠️ 登録に失敗しました。もう一度お試しください。');
-    } finally {
-      btn.disabled = false;
-      btn.textContent = '無料登録';
-    }
-  }
-
-  // スムーズスクロール
-  document.querySelectorAll('a[href^="#"]').forEach(a => {
-    a.addEventListener('click', e => {
-      e.preventDefault();
-      const target = document.querySelector(a.getAttribute('href'));
-      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    });
+  ['ja','en','zh'].forEach(l => {
+    const id = 'lb-' + l;
+    const btn = document.getElementById(id);
+    if (btn) btn.classList.toggle('active', (l === 'zh' ? 'zh-TW' : l) === lang);
   });
+
+  const t = T[lang];
+
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const k = el.dataset.i18n;
+    if (t[k] !== undefined) el.textContent = t[k];
+  });
+  document.querySelectorAll('[data-i18n-html]').forEach(el => {
+    const k = el.dataset.i18nHtml;
+    if (t[k] !== undefined) el.innerHTML = t[k];
+  });
+  document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+    const k = el.dataset.i18nPh;
+    if (t[k] !== undefined) el.placeholder = t[k];
+  });
+
+  // Persona lists
+  ['travelerItems','localItems'].forEach((key, i) => {
+    const listId = i === 0 ? 'traveler-list' : 'local-list';
+    const ul = document.getElementById(listId);
+    if (ul && t[key]) ul.innerHTML = t[key].map(s => `<li>${s}</li>`).join('');
+  });
+
+  // Counter bar
+  if (t.counterBar) {
+    document.getElementById('counter-bar').innerHTML = t.counterBar.replace('{n}', `<span id="spots">${spots}</span>`);
+  }
+}
+
+// ── Spots animation ───────────────────────────────────────
+function animateSpots() {
+  const el = document.getElementById('spots');
+  if (el && spots > 60 && Math.random() < 0.3) { spots--; el.textContent = spots; }
+  setTimeout(animateSpots, 8000 + Math.random() * 12000);
+}
+setTimeout(animateSpots, 15000);
+
+// ── Role select ───────────────────────────────────────────
+let selectedRole = null, selectedRole2 = null;
+
+function selectRole(role) {
+  selectedRole = role;
+  const t = T[currentLang];
+  document.getElementById('btn-traveler').className = 'role-btn' + (role==='traveler' ? ' active-traveler' : '');
+  document.getElementById('btn-local').className    = 'role-btn' + (role==='local'    ? ' active-local'    : '');
+  document.getElementById('reg-form').style.display = 'flex';
+  document.getElementById('micro-hero').style.display = 'block';
+  document.getElementById('role-desc').textContent = role==='traveler' ? t.roleDescTraveler : t.roleDescLocal;
+}
+
+function selectRole2(role) {
+  selectedRole2 = role;
+  document.getElementById('btn-traveler2').className = 'role-btn' + (role==='traveler' ? ' active-traveler' : '');
+  document.getElementById('btn-local2').className    = 'role-btn' + (role==='local'    ? ' active-local'    : '');
+  document.getElementById('reg-form2').style.display = 'flex';
+  document.getElementById('micro-cta').style.display = 'block';
+}
+
+// ── Register ──────────────────────────────────────────────
+const SUPABASE_URL = 'https://fdgyloydctrcwpompaoq.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_zIsHFRSUtPScBmb080mYIQ_WkQ0hrOW';
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+async function register(source) {
+  const t = T[currentLang];
+  const role = source==='hero' ? selectedRole : selectedRole2;
+  const emailEl = document.getElementById(source==='hero' ? 'email-hero' : 'email-cta');
+  const email = emailEl.value.trim();
+
+  if (!role)  { showToast(t.toastNoRole);  return; }
+  if (!email || !email.includes('@')) { showToast(t.toastNoEmail); return; }
+
+  const btn = emailEl.closest('.field-group').querySelector('.btn-register');
+  btn.disabled = true; btn.textContent = t.registerBtnLoading;
+
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/registrations`, {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json', 'apikey':SUPABASE_KEY, 'Authorization':`Bearer ${SUPABASE_KEY}`, 'Prefer':'return=minimal' },
+      body: JSON.stringify({ email, role, source, lang: currentLang }),
+    });
+    if (!res.ok) throw new Error(res.status);
+    if (spots > 0) { spots--; const el = document.getElementById('spots'); if (el) el.textContent = spots; }
+    emailEl.value = '';
+    showToast(t.toastSuccess);
+  } catch {
+    showToast(t.toastError);
+  } finally {
+    btn.disabled = false; btn.textContent = t.registerBtn;
+  }
+}
+
+// Smooth scroll
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    const target = document.querySelector(a.getAttribute('href'));
+    if (target) target.scrollIntoView({ behavior:'smooth', block:'start' });
+  });
+});
+
+// Init
+setLang(currentLang);
 </script>
 </body>
 </html>

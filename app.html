@@ -7,1131 +7,930 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    :root{
+      --blue:#1A56DB;--blue-d:#1239A6;--blue-l:#EBF2FF;
+      --green:#0E9F6E;--orange:#FF5A1F;--purple:#7C3AED;--red:#DC2626;
+      --gray-1:#111827;--gray-2:#374151;--gray-3:#6B7280;--gray-4:#D1D5DB;--gray-5:#F3F4F6;
+      --white:#FFFFFF;--nav-h:64px;
+    }
+    html,body{height:100%;overflow:hidden;background:#1a1a2e;}
+    #app-frame{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#1a1a2e 0%,#16213e 100%);}
+    #app{position:relative;width:min(430px,100vw);height:min(932px,100vh);overflow:hidden;background:var(--white);border-radius:min(44px,4vw);box-shadow:0 40px 120px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.1);}
 
-    :root {
-      --blue:   #1A56DB;
-      --blue-d: #1239A6;
-      --blue-l: #EBF2FF;
-      --green:  #0E9F6E;
-      --orange: #FF5A1F;
-      --purple: #7C3AED;
-      --red:    #DC2626;
-      --gray-1: #111827;
-      --gray-2: #374151;
-      --gray-3: #6B7280;
-      --gray-4: #D1D5DB;
-      --gray-5: #F3F4F6;
-      --white:  #FFFFFF;
-      --nav-h:  64px;
-      --safe-b: env(safe-area-inset-bottom, 0px);
-    }
+    /* Screen system */
+    .screen{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--white);opacity:0;pointer-events:none;transform:translateX(40px);transition:opacity .3s ease,transform .3s ease;z-index:1;}
+    .screen.active{opacity:1;pointer-events:all;transform:none;z-index:2;}
+    .overlay{position:absolute;inset:0;z-index:50;display:flex;flex-direction:column;pointer-events:none;opacity:0;transition:opacity .25s ease;}
+    .overlay.show{opacity:1;pointer-events:all;}
 
-    html, body { height: 100%; overflow: hidden; background: #1a1a2e; }
+    /* Splash */
+    #splash{background:linear-gradient(160deg,#EBF2FF 0%,#fff 70%);align-items:center;justify-content:center;padding:40px 32px;gap:0;}
+    .splash-top{width:100%;display:flex;justify-content:flex-end;margin-bottom:8px;}
+    .lang-toggle-app{display:flex;gap:4px;}
+    .lang-btn-app{padding:5px 9px;border-radius:6px;border:1.5px solid var(--gray-4);background:none;font-size:.73rem;font-weight:700;cursor:pointer;color:var(--gray-3);transition:all .15s;}
+    .lang-btn-app.active{background:var(--blue);color:white;border-color:var(--blue);}
+    .splash-logo{font-size:2.8rem;font-weight:900;color:var(--blue);letter-spacing:-1px;margin-bottom:8px;}
+    .splash-logo span{color:var(--orange);}
+    .splash-tagline{font-size:1rem;color:var(--gray-3);margin-bottom:52px;text-align:center;}
+    .splash-q{font-size:1.1rem;font-weight:800;color:var(--gray-1);margin-bottom:20px;text-align:center;}
+    .role-cards{display:flex;flex-direction:column;gap:14px;width:100%;}
+    .role-card{border-radius:16px;padding:22px 24px;border:2px solid transparent;cursor:pointer;transition:all .2s;text-align:left;display:flex;align-items:center;gap:18px;}
+    .role-card.traveler{background:var(--blue-l);border-color:rgba(26,86,219,.2);}
+    .role-card.local{background:#ECFDF5;border-color:rgba(14,159,110,.2);}
+    .role-card:active{transform:scale(.97);}
+    .role-icon{font-size:2.4rem;flex-shrink:0;}
+    .role-card h3{font-size:1rem;font-weight:800;margin-bottom:4px;}
+    .role-card.traveler h3{color:var(--blue);}
+    .role-card.local h3{color:var(--green);}
+    .role-card p{font-size:.8rem;color:var(--gray-3);line-height:1.5;}
 
-    /* ── Phone Frame ── */
-    #app-frame {
-      position: fixed; inset: 0;
-      display: flex; align-items: center; justify-content: center;
-      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-    }
-    #app {
-      position: relative;
-      width: min(430px, 100vw); height: min(932px, 100vh);
-      overflow: hidden; background: var(--white);
-      border-radius: min(44px, 4vw);
-      box-shadow: 0 40px 120px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.1);
-    }
+    /* Map */
+    #map-screen{position:absolute;inset:0;display:flex;flex-direction:column;}
+    #map-header{position:absolute;top:0;left:0;right:0;z-index:10;padding:12px 16px 0;background:linear-gradient(to bottom,rgba(255,255,255,1) 70%,transparent);}
+    .map-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+    .map-logo{font-size:1.2rem;font-weight:900;color:var(--blue);}
+    .map-logo span{color:var(--orange);}
+    .map-top-right{display:flex;align-items:center;gap:8px;}
+    .avatar-btn{width:36px;height:36px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;font-size:1rem;cursor:pointer;border:none;color:white;}
+    .filter-bar{display:flex;gap:8px;overflow-x:auto;padding-bottom:8px;scrollbar-width:none;}
+    .filter-bar::-webkit-scrollbar{display:none;}
+    .filter-chip{flex-shrink:0;padding:6px 14px;border-radius:100px;border:1.5px solid var(--gray-4);background:var(--white);font-size:.78rem;font-weight:700;color:var(--gray-3);cursor:pointer;transition:all .2s;white-space:nowrap;}
+    .filter-chip.active{border-color:var(--blue);background:var(--blue-l);color:var(--blue);}
+    #map{flex:1;}
+    .sport-marker{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.3rem;border:3px solid white;box-shadow:0 4px 12px rgba(0,0,0,.25);cursor:pointer;}
+    .map-bottom-bar{position:absolute;bottom:var(--nav-h);left:0;right:0;z-index:10;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;}
+    .count-badge{background:var(--gray-1);color:var(--white);padding:8px 16px;border-radius:100px;font-size:.82rem;font-weight:700;}
+    .fab{width:52px;height:52px;border-radius:50%;background:var(--blue);border:none;color:white;font-size:1.6rem;cursor:pointer;box-shadow:0 6px 20px rgba(26,86,219,.4);display:flex;align-items:center;justify-content:center;transition:transform .15s;}
+    .fab:active{transform:scale(.93);}
+    .fab.local-fab{background:var(--green);box-shadow:0 6px 20px rgba(14,159,110,.4);}
 
-    /* ── Screen system ── */
-    .screen {
-      position: absolute; inset: 0;
-      display: flex; flex-direction: column;
-      background: var(--white);
-      opacity: 0; pointer-events: none;
-      transform: translateX(40px);
-      transition: opacity .3s ease, transform .3s ease;
-      z-index: 1;
-    }
-    .screen.active {
-      opacity: 1; pointer-events: all; transform: none; z-index: 2;
-    }
-    .screen.slide-left {
-      transform: translateX(-40px); opacity: 0; pointer-events: none;
-    }
+    /* Bottom Nav */
+    .bottom-nav{position:absolute;bottom:0;left:0;right:0;z-index:20;height:var(--nav-h);background:var(--white);border-top:1px solid var(--gray-4);display:flex;}
+    .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;border:none;background:none;color:var(--gray-3);font-size:.68rem;font-weight:700;transition:color .15s;}
+    .nav-item.active{color:var(--blue);}
+    .nav-icon{font-size:1.3rem;}
+    .nav-badge{position:absolute;top:10px;right:calc(50% - 18px);background:var(--red);color:white;width:16px;height:16px;border-radius:50%;font-size:.6rem;display:flex;align-items:center;justify-content:center;}
 
-    /* ── Overlays ── */
-    .overlay {
-      position: absolute; inset: 0; z-index: 50;
-      display: flex; flex-direction: column;
-      pointer-events: none; opacity: 0;
-      transition: opacity .25s ease;
-    }
-    .overlay.show { opacity: 1; pointer-events: all; }
+    /* Activity Card */
+    #card-overlay{background:rgba(0,0,0,.45);backdrop-filter:blur(2px);justify-content:flex-end;}
+    #card-overlay .card-backdrop{position:absolute;inset:0;}
+    .card-sheet{position:relative;z-index:1;background:var(--white);border-radius:24px 24px 0 0;padding:0 0 32px;max-height:80%;transform:translateY(100%);transition:transform .35s cubic-bezier(.32,1,.32,1);display:flex;flex-direction:column;}
+    #card-overlay.show .card-sheet{transform:none;}
+    .card-handle{width:40px;height:4px;border-radius:2px;background:var(--gray-4);margin:12px auto 16px;flex-shrink:0;}
+    .card-scroll{overflow-y:auto;padding:0 20px;flex:1;}
+    .card-hero{display:flex;gap:14px;align-items:flex-start;margin-bottom:16px;}
+    .player-avatar{width:60px;height:60px;border-radius:50%;background:var(--blue-l);display:flex;align-items:center;justify-content:center;font-size:1.8rem;flex-shrink:0;}
+    .player-name{font-size:1.1rem;font-weight:800;margin-bottom:2px;}
+    .player-meta{font-size:.8rem;color:var(--gray-3);display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
+    .verified-badge{color:var(--blue);font-size:.75rem;font-weight:700;}
+    .stars{color:#FBBF24;font-size:.85rem;}
+    .sport-pill{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:100px;font-size:.75rem;font-weight:700;}
+    .card-section{margin-bottom:14px;}
+    .card-label{font-size:.72rem;font-weight:700;color:var(--gray-3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;}
+    .card-value{font-size:.9rem;color:var(--gray-1);font-weight:500;}
+    .tags{display:flex;flex-wrap:wrap;gap:6px;}
+    .tag{padding:4px 10px;border-radius:100px;font-size:.75rem;font-weight:700;background:var(--gray-5);color:var(--gray-2);}
+    .tag.lang{background:var(--blue-l);color:var(--blue);}
+    .cost-box{background:var(--gray-5);border-radius:12px;padding:12px 14px;display:flex;gap:10px;align-items:center;}
+    .cost-text{font-size:.85rem;color:var(--gray-1);font-weight:600;}
+    .bio-text{font-size:.85rem;color:var(--gray-2);line-height:1.6;}
+    .card-footer{padding:12px 20px 0;flex-shrink:0;}
+    .btn-request{width:100%;padding:16px;border-radius:14px;background:var(--blue);color:var(--white);border:none;font-size:1rem;font-weight:800;cursor:pointer;transition:background .2s;}
+    .btn-request:active{background:var(--blue-d);}
 
-    /* ── Splash ── */
-    #splash {
-      background: linear-gradient(160deg, #EBF2FF 0%, #fff 70%);
-      align-items: center; justify-content: center; gap: 0;
-      padding: 40px 32px;
-    }
-    .splash-logo { font-size: 2.8rem; font-weight: 900; color: var(--blue); letter-spacing: -1px; margin-bottom: 8px; }
-    .splash-logo span { color: var(--orange); }
-    .splash-tagline { font-size: 1rem; color: var(--gray-3); margin-bottom: 52px; text-align: center; }
-    .splash-q { font-size: 1.1rem; font-weight: 800; color: var(--gray-1); margin-bottom: 20px; text-align: center; }
-    .role-cards { display: flex; flex-direction: column; gap: 14px; width: 100%; }
-    .role-card {
-      border-radius: 16px; padding: 22px 24px;
-      border: 2px solid transparent; cursor: pointer;
-      transition: all .2s; text-align: left;
-      display: flex; align-items: center; gap: 18px;
-    }
-    .role-card.traveler { background: var(--blue-l); border-color: rgba(26,86,219,.2); }
-    .role-card.local    { background: #ECFDF5;     border-color: rgba(14,159,110,.2); }
-    .role-card:active { transform: scale(.97); }
-    .role-icon { font-size: 2.4rem; flex-shrink: 0; }
-    .role-card h3 { font-size: 1rem; font-weight: 800; margin-bottom: 4px; }
-    .role-card.traveler h3 { color: var(--blue); }
-    .role-card.local    h3 { color: var(--green); }
-    .role-card p { font-size: .8rem; color: var(--gray-3); line-height: 1.5; }
+    /* Request modal */
+    #request-overlay{background:rgba(0,0,0,.5);backdrop-filter:blur(3px);align-items:center;justify-content:center;padding:24px;}
+    .request-modal{background:var(--white);border-radius:24px;width:100%;padding:28px 24px;transform:scale(.92);transition:transform .3s cubic-bezier(.32,1,.32,1);}
+    #request-overlay.show .request-modal{transform:none;}
+    .modal-title{font-size:1.1rem;font-weight:900;margin-bottom:6px;text-align:center;}
+    .modal-sub{font-size:.85rem;color:var(--gray-3);text-align:center;margin-bottom:20px;line-height:1.6;}
+    .confirm-player{display:flex;gap:12px;align-items:center;background:var(--gray-5);border-radius:12px;padding:12px 14px;margin-bottom:20px;}
+    .confirm-avatar{width:44px;height:44px;border-radius:50%;background:var(--blue-l);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;}
+    .confirm-name{font-weight:800;font-size:.85rem;}
+    .confirm-detail{color:var(--gray-3);font-size:.78rem;margin-top:2px;}
+    .btn-row{display:flex;gap:10px;}
+    .btn-cancel{flex:1;padding:14px;border-radius:12px;border:1.5px solid var(--gray-4);background:var(--white);font-size:.9rem;font-weight:700;color:var(--gray-2);cursor:pointer;}
+    .btn-confirm{flex:2;padding:14px;border-radius:12px;border:none;background:var(--blue);color:var(--white);font-size:.9rem;font-weight:800;cursor:pointer;}
 
-    /* ── Map screen ── */
-    #map-screen { position: absolute; inset: 0; display: flex; flex-direction: column; }
-    #map-header {
-      position: absolute; top: 0; left: 0; right: 0; z-index: 10;
-      padding: 12px 16px 0;
-      background: linear-gradient(to bottom, rgba(255,255,255,1) 70%, transparent);
-    }
-    .map-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-    .map-logo { font-size: 1.2rem; font-weight: 900; color: var(--blue); }
-    .map-logo span { color: var(--orange); }
-    .avatar-btn {
-      width: 36px; height: 36px; border-radius: 50%;
-      background: var(--blue); display: flex; align-items: center; justify-content: center;
-      font-size: 1rem; cursor: pointer; border: none; color: white;
-    }
-    .filter-bar { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: none; }
-    .filter-bar::-webkit-scrollbar { display: none; }
-    .filter-chip {
-      flex-shrink: 0; padding: 6px 14px; border-radius: 100px;
-      border: 1.5px solid var(--gray-4); background: var(--white);
-      font-size: .78rem; font-weight: 700; color: var(--gray-3);
-      cursor: pointer; transition: all .2s; white-space: nowrap;
-    }
-    .filter-chip.active { border-color: var(--blue); background: var(--blue-l); color: var(--blue); }
-    #map { flex: 1; }
-    .leaflet-container { font-family: inherit; }
+    /* Matching */
+    #matching-overlay{background:var(--blue);align-items:center;justify-content:center;flex-direction:column;gap:20px;}
+    .matching-anim{position:relative;width:120px;height:120px;}
+    .matching-ring{position:absolute;inset:0;border-radius:50%;border:3px solid rgba(255,255,255,.3);animation:spin-ring 1.4s linear infinite;}
+    .matching-ring:nth-child(2){inset:10px;animation-delay:-.7s;animation-direction:reverse;}
+    @keyframes spin-ring{to{transform:rotate(360deg);}}
+    .matching-icon{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:2.6rem;}
+    .matching-text{color:var(--white);font-size:1rem;font-weight:700;opacity:.85;}
+    .matching-dots::after{content:'';animation:dots 1.5s infinite;}
+    @keyframes dots{0%{content:'';}33%{content:'.';}66%{content:'..';}100%{content:'...'}}
 
-    /* Custom markers */
-    .sport-marker {
-      width: 44px; height: 44px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.3rem; border: 3px solid white;
-      box-shadow: 0 4px 12px rgba(0,0,0,.25);
-      cursor: pointer; transition: transform .15s;
-    }
-    .sport-marker:active { transform: scale(1.15); }
-    .sport-marker.pulse::after {
-      content: '';
-      position: absolute; inset: -6px; border-radius: 50%;
-      border: 2px solid currentColor;
-      animation: pulse 2s infinite;
-      opacity: 0;
-    }
-    @keyframes pulse {
-      0% { transform: scale(1); opacity: .6; }
-      100% { transform: scale(1.6); opacity: 0; }
-    }
+    /* Matched */
+    #matched-overlay{background:linear-gradient(160deg,#0E9F6E 0%,#047857 100%);align-items:center;justify-content:center;flex-direction:column;padding:32px;}
+    .matched-emoji{font-size:4rem;margin-bottom:8px;animation:bounce-in .5s cubic-bezier(.32,1.6,.32,1);}
+    @keyframes bounce-in{from{transform:scale(0);}to{transform:scale(1);}}
+    .matched-title{font-size:1.8rem;font-weight:900;color:var(--white);margin-bottom:8px;text-align:center;}
+    .matched-sub{font-size:.9rem;color:rgba(255,255,255,.8);text-align:center;margin-bottom:32px;line-height:1.6;}
+    .matched-card{background:rgba(255,255,255,.15);backdrop-filter:blur(10px);border-radius:20px;padding:20px;width:100%;margin-bottom:28px;border:1px solid rgba(255,255,255,.25);}
+    .matched-player{display:flex;gap:14px;align-items:center;margin-bottom:14px;}
+    .matched-avatar{width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:1.5rem;}
+    .matched-pname{font-weight:800;color:var(--white);font-size:1rem;}
+    .matched-pmeta{font-size:.78rem;color:rgba(255,255,255,.7);margin-top:2px;}
+    .matched-info{display:flex;flex-direction:column;gap:8px;}
+    .matched-row{display:flex;gap:10px;align-items:center;}
+    .matched-row .mi{font-size:1rem;}
+    .matched-row .ml{font-size:.85rem;color:rgba(255,255,255,.85);}
+    .btn-done{width:100%;padding:16px;border-radius:14px;border:2px solid rgba(255,255,255,.4);background:rgba(255,255,255,.15);color:var(--white);font-size:1rem;font-weight:800;cursor:pointer;margin-bottom:12px;}
+    .btn-review{width:100%;padding:16px;border-radius:14px;border:none;background:var(--white);color:var(--green);font-size:1rem;font-weight:800;cursor:pointer;}
 
-    /* Map bottom */
-    .map-bottom-bar {
-      position: absolute; bottom: var(--nav-h); left: 0; right: 0; z-index: 10;
-      padding: 12px 16px;
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    .count-badge {
-      background: var(--gray-1); color: var(--white);
-      padding: 8px 16px; border-radius: 100px;
-      font-size: .82rem; font-weight: 700;
-    }
-    .fab {
-      width: 52px; height: 52px; border-radius: 50%;
-      background: var(--blue); border: none; color: white;
-      font-size: 1.6rem; cursor: pointer; box-shadow: 0 6px 20px rgba(26,86,219,.4);
-      display: flex; align-items: center; justify-content: center;
-      transition: transform .15s;
-    }
-    .fab:active { transform: scale(.93); }
-    .fab.local-fab { background: var(--green); box-shadow: 0 6px 20px rgba(14,159,110,.4); }
+    /* Notifications */
+    #notify-screen{flex-direction:column;}
+    .screen-header{padding:56px 20px 16px;border-bottom:1px solid var(--gray-4);}
+    .screen-header h2{font-size:1.4rem;font-weight:900;}
+    .notif-list{flex:1;overflow-y:auto;}
+    .notif-item{display:flex;gap:14px;align-items:flex-start;padding:16px 20px;border-bottom:1px solid var(--gray-5);}
+    .notif-item.unread{background:var(--blue-l);}
+    .notif-avatar{width:44px;height:44px;border-radius:50%;background:var(--gray-5);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;}
+    .notif-title{font-size:.88rem;font-weight:700;margin-bottom:3px;}
+    .notif-body{font-size:.8rem;color:var(--gray-3);line-height:1.5;}
+    .notif-time{font-size:.72rem;color:var(--gray-3);margin-top:4px;}
 
-    /* ── Bottom Nav ── */
-    .bottom-nav {
-      position: absolute; bottom: 0; left: 0; right: 0; z-index: 20;
-      height: var(--nav-h); background: var(--white);
-      border-top: 1px solid var(--gray-4);
-      display: flex;
-    }
-    .nav-item {
-      flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-      gap: 3px; cursor: pointer; border: none; background: none;
-      color: var(--gray-3); font-size: .68rem; font-weight: 700;
-      transition: color .15s;
-    }
-    .nav-item.active { color: var(--blue); }
-    .nav-icon { font-size: 1.3rem; }
-    .nav-badge {
-      position: absolute; top: 10px; right: calc(50% - 18px);
-      background: var(--red); color: white;
-      width: 16px; height: 16px; border-radius: 50%; font-size: .6rem;
-      display: flex; align-items: center; justify-content: center;
-    }
+    /* Profile */
+    #profile-screen{flex-direction:column;overflow-y:auto;}
+    .profile-header{padding:56px 20px 24px;background:linear-gradient(160deg,var(--blue-l) 0%,var(--white) 100%);display:flex;flex-direction:column;align-items:center;text-align:center;}
+    .profile-avatar-lg{width:80px;height:80px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;font-size:2.4rem;margin-bottom:14px;border:4px solid var(--white);box-shadow:0 4px 16px rgba(26,86,219,.25);}
+    .profile-name{font-size:1.3rem;font-weight:900;margin-bottom:4px;}
+    .profile-role{display:inline-flex;align-items:center;gap:4px;padding:4px 12px;border-radius:100px;font-size:.78rem;font-weight:700;margin-bottom:12px;}
+    .profile-role.traveler{background:var(--blue-l);color:var(--blue);}
+    .profile-role.local{background:#ECFDF5;color:var(--green);}
+    .profile-kyc{display:flex;align-items:center;gap:6px;font-size:.8rem;font-weight:700;color:var(--green);}
+    .lang-section{margin:16px 0 0;display:flex;align-items:center;gap:8px;}
+    .lang-section span{font-size:.8rem;color:var(--gray-3);font-weight:600;}
+    .lang-toggle-profile{display:flex;gap:4px;}
+    .lang-btn-p{padding:5px 10px;border-radius:6px;border:1.5px solid var(--gray-4);background:none;font-size:.75rem;font-weight:700;cursor:pointer;color:var(--gray-3);transition:all .15s;}
+    .lang-btn-p.active{background:var(--blue);color:white;border-color:var(--blue);}
+    .stats-row{display:flex;gap:0;border-top:1px solid var(--gray-4);border-bottom:1px solid var(--gray-4);}
+    .stat-item{flex:1;text-align:center;padding:18px 8px;border-right:1px solid var(--gray-4);}
+    .stat-item:last-child{border-right:none;}
+    .stat-num{font-size:1.4rem;font-weight:900;color:var(--blue);}
+    .stat-lbl{font-size:.7rem;color:var(--gray-3);margin-top:3px;}
+    .profile-section{padding:20px;border-bottom:1px solid var(--gray-5);}
+    .profile-section h4{font-size:.8rem;font-weight:700;color:var(--gray-3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px;}
+    .sport-list{display:flex;flex-direction:column;gap:10px;}
+    .sport-row{display:flex;justify-content:space-between;align-items:center;}
+    .sport-row-left{display:flex;gap:10px;align-items:center;font-size:.9rem;font-weight:600;}
+    .skill-bar-bg{flex:1;height:6px;background:var(--gray-4);border-radius:3px;overflow:hidden;}
+    .skill-bar-fill{height:100%;border-radius:3px;}
+    .lang-tags{display:flex;flex-wrap:wrap;gap:8px;}
+    .lang-tag{padding:6px 14px;border-radius:100px;background:var(--blue-l);color:var(--blue);font-size:.82rem;font-weight:700;}
+    .settings-list{display:flex;flex-direction:column;}
+    .settings-row{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--gray-5);cursor:pointer;}
+    .settings-row:active{background:var(--gray-5);}
+    .settings-label{font-size:.9rem;font-weight:600;display:flex;gap:10px;align-items:center;}
+    .settings-arrow{color:var(--gray-4);font-size:1rem;}
 
-    /* ── Activity Card overlay ── */
-    #card-overlay { background: rgba(0,0,0,.45); backdrop-filter: blur(2px); justify-content: flex-end; }
-    #card-overlay .card-backdrop { position: absolute; inset: 0; }
-    .card-sheet {
-      position: relative; z-index: 1;
-      background: var(--white); border-radius: 24px 24px 0 0;
-      padding: 0 0 32px; max-height: 80%;
-      transform: translateY(100%); transition: transform .35s cubic-bezier(.32,1,.32,1);
-      display: flex; flex-direction: column;
-    }
-    #card-overlay.show .card-sheet { transform: none; }
-    .card-handle { width: 40px; height: 4px; border-radius: 2px; background: var(--gray-4); margin: 12px auto 16px; flex-shrink: 0; }
-    .card-scroll { overflow-y: auto; padding: 0 20px; flex: 1; }
-    .card-hero { display: flex; gap: 14px; align-items: flex-start; margin-bottom: 16px; }
-    .player-avatar {
-      width: 60px; height: 60px; border-radius: 50%;
-      background: var(--blue-l); display: flex; align-items: center; justify-content: center;
-      font-size: 1.8rem; flex-shrink: 0;
-    }
-    .player-info { flex: 1; min-width: 0; }
-    .player-name { font-size: 1.1rem; font-weight: 800; margin-bottom: 2px; }
-    .player-meta { font-size: .8rem; color: var(--gray-3); display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
-    .verified-badge { color: var(--blue); font-size: .75rem; font-weight: 700; }
-    .stars { color: #FBBF24; font-size: .85rem; }
-    .sport-pill {
-      display: inline-flex; align-items: center; gap: 4px;
-      padding: 4px 10px; border-radius: 100px;
-      font-size: .75rem; font-weight: 700;
-    }
-    .card-section { margin-bottom: 14px; }
-    .card-label { font-size: .72rem; font-weight: 700; color: var(--gray-3); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; }
-    .card-value { font-size: .9rem; color: var(--gray-1); font-weight: 500; }
-    .tags { display: flex; flex-wrap: wrap; gap: 6px; }
-    .tag {
-      padding: 4px 10px; border-radius: 100px; font-size: .75rem; font-weight: 700;
-      background: var(--gray-5); color: var(--gray-2);
-    }
-    .tag.lang { background: var(--blue-l); color: var(--blue); }
-    .tag.skill { }
-    .cost-box { background: var(--gray-5); border-radius: 12px; padding: 12px 14px; display: flex; gap: 10px; align-items: center; }
-    .cost-icon { font-size: 1.3rem; }
-    .cost-text { font-size: .85rem; color: var(--gray-1); font-weight: 600; }
-    .bio-text { font-size: .85rem; color: var(--gray-2); line-height: 1.6; }
-    .card-footer { padding: 12px 20px 0; flex-shrink: 0; }
-    .btn-request {
-      width: 100%; padding: 16px; border-radius: 14px;
-      background: var(--blue); color: var(--white);
-      border: none; font-size: 1rem; font-weight: 800;
-      cursor: pointer; transition: background .2s;
-    }
-    .btn-request:active { background: var(--blue-d); }
+    /* Create */
+    #create-screen{flex-direction:column;}
+    .create-header{padding:56px 20px 20px;display:flex;align-items:center;gap:14px;border-bottom:1px solid var(--gray-4);}
+    .back-btn{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--gray-4);background:none;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1rem;color:var(--gray-2);flex-shrink:0;}
+    .create-header h2{font-size:1.2rem;font-weight:900;}
+    .create-form{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:18px;}
+    .form-group label{display:block;font-size:.78rem;font-weight:700;color:var(--gray-3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;}
+    .form-group select,.form-group input{width:100%;padding:13px 14px;border:1.5px solid var(--gray-4);border-radius:10px;font-size:.9rem;font-family:inherit;color:var(--gray-1);outline:none;appearance:none;background:var(--white);}
+    .form-group select:focus,.form-group input:focus{border-color:var(--blue);}
+    .cost-options{display:flex;flex-direction:column;gap:8px;}
+    .cost-option{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1.5px solid var(--gray-4);border-radius:10px;cursor:pointer;}
+    .cost-option input[type=radio]{accent-color:var(--blue);width:16px;height:16px;}
+    .cost-option span{font-size:.88rem;font-weight:600;}
+    .create-footer{padding:12px 20px 28px;border-top:1px solid var(--gray-4);}
+    .btn-publish{width:100%;padding:16px;border-radius:14px;border:none;background:var(--green);color:var(--white);font-size:1rem;font-weight:800;cursor:pointer;}
 
-    /* ── Request overlay ── */
-    #request-overlay { background: rgba(0,0,0,.5); backdrop-filter: blur(3px); align-items: center; justify-content: center; padding: 24px; }
-    .request-modal {
-      background: var(--white); border-radius: 24px; width: 100%;
-      padding: 28px 24px;
-      transform: scale(.92); transition: transform .3s cubic-bezier(.32,1,.32,1);
-    }
-    #request-overlay.show .request-modal { transform: none; }
-    .modal-title { font-size: 1.1rem; font-weight: 900; margin-bottom: 6px; text-align: center; }
-    .modal-sub { font-size: .85rem; color: var(--gray-3); text-align: center; margin-bottom: 20px; line-height: 1.6; }
-    .confirm-player { display: flex; gap: 12px; align-items: center; background: var(--gray-5); border-radius: 12px; padding: 12px 14px; margin-bottom: 20px; }
-    .confirm-avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--blue-l); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; }
-    .confirm-info { font-size: .85rem; }
-    .confirm-name { font-weight: 800; }
-    .confirm-detail { color: var(--gray-3); font-size: .78rem; margin-top: 2px; }
-    .btn-row { display: flex; gap: 10px; }
-    .btn-cancel { flex: 1; padding: 14px; border-radius: 12px; border: 1.5px solid var(--gray-4); background: var(--white); font-size: .9rem; font-weight: 700; color: var(--gray-2); cursor: pointer; }
-    .btn-confirm { flex: 2; padding: 14px; border-radius: 12px; border: none; background: var(--blue); color: var(--white); font-size: .9rem; font-weight: 800; cursor: pointer; }
+    /* Review */
+    #review-overlay{background:rgba(0,0,0,.5);backdrop-filter:blur(3px);align-items:center;justify-content:center;padding:24px;}
+    .review-modal{background:var(--white);border-radius:24px;width:100%;padding:28px 24px;transform:scale(.92);transition:transform .3s cubic-bezier(.32,1,.32,1);}
+    #review-overlay.show .review-modal{transform:none;}
+    .review-player{display:flex;gap:12px;align-items:center;margin-bottom:20px;}
+    .review-avatar{width:50px;height:50px;border-radius:50%;background:var(--blue-l);display:flex;align-items:center;justify-content:center;font-size:1.5rem;}
+    .review-categories{display:flex;flex-direction:column;gap:14px;margin-bottom:24px;}
+    .review-cat{display:flex;justify-content:space-between;align-items:center;}
+    .review-cat-label{font-size:.88rem;font-weight:600;}
+    .star-row{display:flex;gap:6px;}
+    .star{font-size:1.4rem;cursor:pointer;color:var(--gray-4);transition:color .1s,transform .1s;}
+    .star.filled{color:#FBBF24;}
+    .star:active{transform:scale(1.3);}
+    .btn-submit-review{width:100%;padding:14px;border-radius:12px;border:none;background:var(--blue);color:var(--white);font-size:.95rem;font-weight:800;cursor:pointer;}
 
-    /* ── Matching overlay ── */
-    #matching-overlay { background: var(--blue); align-items: center; justify-content: center; flex-direction: column; gap: 20px; }
-    .matching-anim { position: relative; width: 120px; height: 120px; }
-    .matching-ring {
-      position: absolute; inset: 0; border-radius: 50%;
-      border: 3px solid rgba(255,255,255,.3);
-      animation: spin-ring 1.4s linear infinite;
-    }
-    .matching-ring:nth-child(2) { inset: 10px; animation-delay: -.7s; animation-direction: reverse; }
-    @keyframes spin-ring { to { transform: rotate(360deg); } }
-    .matching-icon { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 2.6rem; }
-    .matching-text { color: var(--white); font-size: 1rem; font-weight: 700; opacity: .85; }
-    .matching-dots::after {
-      content: '';
-      animation: dots 1.5s infinite;
-    }
-    @keyframes dots {
-      0%   { content: ''; }
-      33%  { content: '.'; }
-      66%  { content: '..'; }
-      100% { content: '...'; }
-    }
-
-    /* ── Match confirmed ── */
-    #matched-overlay { background: linear-gradient(160deg, #0E9F6E 0%, #047857 100%); align-items: center; justify-content: center; flex-direction: column; padding: 32px; }
-    .matched-emoji { font-size: 4rem; margin-bottom: 8px; animation: bounce-in .5s cubic-bezier(.32,1.6,.32,1); }
-    @keyframes bounce-in { from { transform: scale(0); } to { transform: scale(1); } }
-    .matched-title { font-size: 1.8rem; font-weight: 900; color: var(--white); margin-bottom: 8px; text-align: center; }
-    .matched-sub { font-size: .9rem; color: rgba(255,255,255,.8); text-align: center; margin-bottom: 32px; line-height: 1.6; }
-    .matched-card {
-      background: rgba(255,255,255,.15); backdrop-filter: blur(10px);
-      border-radius: 20px; padding: 20px; width: 100%; margin-bottom: 28px;
-      border: 1px solid rgba(255,255,255,.25);
-    }
-    .matched-player { display: flex; gap: 14px; align-items: center; margin-bottom: 14px; }
-    .matched-avatar { width: 52px; height: 52px; border-radius: 50%; background: rgba(255,255,255,.2); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
-    .matched-pname { font-weight: 800; color: var(--white); font-size: 1rem; }
-    .matched-pmeta { font-size: .78rem; color: rgba(255,255,255,.7); margin-top: 2px; }
-    .matched-info { display: flex; flex-direction: column; gap: 8px; }
-    .matched-row { display: flex; gap: 10px; align-items: center; }
-    .matched-row .mi { font-size: 1rem; }
-    .matched-row .ml { font-size: .85rem; color: rgba(255,255,255,.85); }
-    .btn-done { width: 100%; padding: 16px; border-radius: 14px; border: 2px solid rgba(255,255,255,.4); background: rgba(255,255,255,.15); color: var(--white); font-size: 1rem; font-weight: 800; cursor: pointer; margin-bottom: 12px; }
-    .btn-review { width: 100%; padding: 16px; border-radius: 14px; border: none; background: var(--white); color: var(--green); font-size: 1rem; font-weight: 800; cursor: pointer; }
-
-    /* ── Notifications screen ── */
-    #notify-screen { flex-direction: column; }
-    .screen-header { padding: 56px 20px 16px; border-bottom: 1px solid var(--gray-4); }
-    .screen-header h2 { font-size: 1.4rem; font-weight: 900; }
-    .notif-list { flex: 1; overflow-y: auto; }
-    .notif-item {
-      display: flex; gap: 14px; align-items: flex-start;
-      padding: 16px 20px; border-bottom: 1px solid var(--gray-5);
-    }
-    .notif-item.unread { background: var(--blue-l); }
-    .notif-avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--gray-5); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; }
-    .notif-content { flex: 1; }
-    .notif-title { font-size: .88rem; font-weight: 700; margin-bottom: 3px; }
-    .notif-body { font-size: .8rem; color: var(--gray-3); line-height: 1.5; }
-    .notif-time { font-size: .72rem; color: var(--gray-3); margin-top: 4px; }
-
-    /* ── Profile screen ── */
-    #profile-screen { flex-direction: column; overflow-y: auto; }
-    .profile-header {
-      padding: 56px 20px 24px; background: linear-gradient(160deg, var(--blue-l) 0%, var(--white) 100%);
-      display: flex; flex-direction: column; align-items: center; text-align: center;
-    }
-    .profile-avatar-lg {
-      width: 80px; height: 80px; border-radius: 50%;
-      background: var(--blue); display: flex; align-items: center; justify-content: center;
-      font-size: 2.4rem; margin-bottom: 14px;
-      border: 4px solid var(--white); box-shadow: 0 4px 16px rgba(26,86,219,.25);
-    }
-    .profile-name { font-size: 1.3rem; font-weight: 900; margin-bottom: 4px; }
-    .profile-role {
-      display: inline-flex; align-items: center; gap: 4px;
-      padding: 4px 12px; border-radius: 100px;
-      font-size: .78rem; font-weight: 700; margin-bottom: 12px;
-    }
-    .profile-role.traveler { background: var(--blue-l); color: var(--blue); }
-    .profile-role.local    { background: #ECFDF5;     color: var(--green); }
-    .profile-kyc { display: flex; align-items: center; gap: 6px; font-size: .8rem; font-weight: 700; color: var(--green); }
-    .stats-row { display: flex; gap: 0; border-top: 1px solid var(--gray-4); border-bottom: 1px solid var(--gray-4); margin: 0; }
-    .stat-item { flex: 1; text-align: center; padding: 18px 8px; border-right: 1px solid var(--gray-4); }
-    .stat-item:last-child { border-right: none; }
-    .stat-num { font-size: 1.4rem; font-weight: 900; color: var(--blue); }
-    .stat-lbl { font-size: .7rem; color: var(--gray-3); margin-top: 3px; }
-    .profile-section { padding: 20px; border-bottom: 1px solid var(--gray-5); }
-    .profile-section h4 { font-size: .8rem; font-weight: 700; color: var(--gray-3); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 12px; }
-    .sport-list { display: flex; flex-direction: column; gap: 10px; }
-    .sport-row { display: flex; justify-content: space-between; align-items: center; }
-    .sport-row-left { display: flex; gap: 10px; align-items: center; font-size: .9rem; font-weight: 600; }
-    .skill-bar-bg { flex: 1; height: 6px; background: var(--gray-4); border-radius: 3px; overflow: hidden; }
-    .skill-bar-fill { height: 100%; border-radius: 3px; transition: width .6s ease; }
-    .lang-tags { display: flex; flex-wrap: wrap; gap: 8px; }
-    .lang-tag { padding: 6px 14px; border-radius: 100px; background: var(--blue-l); color: var(--blue); font-size: .82rem; font-weight: 700; }
-    .settings-list { display: flex; flex-direction: column; }
-    .settings-row {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 16px 20px; border-bottom: 1px solid var(--gray-5); cursor: pointer;
-    }
-    .settings-row:active { background: var(--gray-5); }
-    .settings-label { font-size: .9rem; font-weight: 600; display: flex; gap: 10px; align-items: center; }
-    .settings-arrow { color: var(--gray-4); font-size: 1rem; }
-
-    /* ── Create Listing (Local) ── */
-    #create-screen { flex-direction: column; }
-    .create-header { padding: 56px 20px 20px; display: flex; align-items: center; gap: 14px; border-bottom: 1px solid var(--gray-4); }
-    .back-btn { width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid var(--gray-4); background: none; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1rem; color: var(--gray-2); flex-shrink: 0; }
-    .create-header h2 { font-size: 1.2rem; font-weight: 900; }
-    .create-form { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 18px; }
-    .form-group label { display: block; font-size: .78rem; font-weight: 700; color: var(--gray-3); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 8px; }
-    .form-group select, .form-group input {
-      width: 100%; padding: 13px 14px; border: 1.5px solid var(--gray-4); border-radius: 10px;
-      font-size: .9rem; font-family: inherit; color: var(--gray-1); outline: none;
-      appearance: none; background: var(--white);
-    }
-    .form-group select:focus, .form-group input:focus { border-color: var(--blue); }
-    .cost-options { display: flex; flex-direction: column; gap: 8px; }
-    .cost-option {
-      display: flex; align-items: center; gap: 12px; padding: 12px 14px;
-      border: 1.5px solid var(--gray-4); border-radius: 10px; cursor: pointer;
-    }
-    .cost-option input[type=radio] { accent-color: var(--blue); width: 16px; height: 16px; }
-    .cost-option span { font-size: .88rem; font-weight: 600; }
-    .create-footer { padding: 12px 20px 28px; border-top: 1px solid var(--gray-4); }
-    .btn-publish { width: 100%; padding: 16px; border-radius: 14px; border: none; background: var(--green); color: var(--white); font-size: 1rem; font-weight: 800; cursor: pointer; }
-    .btn-publish:active { background: #0a8a5e; }
-
-    /* ── Review overlay ── */
-    #review-overlay { background: rgba(0,0,0,.5); backdrop-filter: blur(3px); align-items: center; justify-content: center; padding: 24px; }
-    .review-modal { background: var(--white); border-radius: 24px; width: 100%; padding: 28px 24px; transform: scale(.92); transition: transform .3s cubic-bezier(.32,1,.32,1); }
-    #review-overlay.show .review-modal { transform: none; }
-    .review-player { display: flex; gap: 12px; align-items: center; margin-bottom: 20px; }
-    .review-avatar { width: 50px; height: 50px; border-radius: 50%; background: var(--blue-l); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
-    .review-categories { display: flex; flex-direction: column; gap: 14px; margin-bottom: 24px; }
-    .review-cat { display: flex; justify-content: space-between; align-items: center; }
-    .review-cat-label { font-size: .88rem; font-weight: 600; }
-    .star-row { display: flex; gap: 6px; }
-    .star {
-      font-size: 1.4rem; cursor: pointer; color: var(--gray-4);
-      transition: color .1s, transform .1s;
-    }
-    .star.filled { color: #FBBF24; }
-    .star:active { transform: scale(1.3); }
-    .btn-submit-review { width: 100%; padding: 14px; border-radius: 12px; border: none; background: var(--blue); color: var(--white); font-size: .95rem; font-weight: 800; cursor: pointer; }
-
-    /* Utility */
-    .hidden { display: none !important; }
-    .leaflet-control-attribution { font-size: 8px !important; }
+    .leaflet-control-attribution{font-size:8px!important;}
   </style>
 </head>
 <body>
-<div id="app-frame">
-<div id="app">
+<div id="app-frame"><div id="app">
 
-  <!-- ═══════════════════════════════════════
-       SCREEN 1: Splash / Role Select
-  ═══════════════════════════════════════ -->
-  <div class="screen active" id="splash">
-    <div style="width:100%;text-align:center;margin-bottom:32px">
-      <div class="splash-logo">Play<span>mate</span></div>
-      <div class="splash-tagline">旅先でスポーツ仲間を、今すぐ。</div>
-    </div>
-    <div class="splash-q">あなたはどちらですか？</div>
-    <div class="role-cards">
-      <div class="role-card traveler" onclick="startApp('traveler')">
-        <div class="role-icon">✈️</div>
-        <div>
-          <h3>トラベラー</h3>
-          <p>旅行・出張先で現地のスポーツ仲間を探したい</p>
-        </div>
-      </div>
-      <div class="role-card local" onclick="startApp('local')">
-        <div class="role-icon">🏠</div>
-        <div>
-          <h3>ローカル</h3>
-          <p>旅行者と交流しながらスポーツしたい</p>
-        </div>
-      </div>
+<!-- ── SPLASH ── -->
+<div class="screen active" id="splash">
+  <div class="splash-top">
+    <div class="lang-toggle-app">
+      <button class="lang-btn-app active" id="alb-ja" onclick="setLang('ja')">日</button>
+      <button class="lang-btn-app" id="alb-en" onclick="setLang('en')">EN</button>
+      <button class="lang-btn-app" id="alb-zh" onclick="setLang('zh-TW')">繁</button>
     </div>
   </div>
+  <div style="width:100%;text-align:center;margin-bottom:32px">
+    <div class="splash-logo">Play<span>mate</span></div>
+    <div class="splash-tagline" data-i18n="tagline">旅先でスポーツ仲間を、今すぐ。</div>
+  </div>
+  <div class="splash-q" data-i18n="splashQ">あなたはどちらですか？</div>
+  <div class="role-cards">
+    <div class="role-card traveler" onclick="startApp('traveler')">
+      <div class="role-icon">✈️</div>
+      <div><h3 data-i18n="rcTravelerTitle">トラベラー</h3><p data-i18n="rcTravelerBody">旅行・出張先で現地のスポーツ仲間を探したい</p></div>
+    </div>
+    <div class="role-card local" onclick="startApp('local')">
+      <div class="role-icon">🏠</div>
+      <div><h3 data-i18n="rcLocalTitle">ローカル</h3><p data-i18n="rcLocalBody">旅行者と交流しながらスポーツしたい</p></div>
+    </div>
+  </div>
+</div>
 
-  <!-- ═══════════════════════════════════════
-       SCREEN 2: Map (main)
-  ═══════════════════════════════════════ -->
-  <div class="screen" id="map-screen">
-    <div id="map-header">
-      <div class="map-top">
-        <div class="map-logo">Play<span>mate</span></div>
+<!-- ── MAP ── -->
+<div class="screen" id="map-screen">
+  <div id="map-header">
+    <div class="map-top">
+      <div class="map-logo">Play<span>mate</span></div>
+      <div class="map-top-right">
+        <div class="lang-toggle-app">
+          <button class="lang-btn-app active" id="mlb-ja" onclick="setLang('ja')">日</button>
+          <button class="lang-btn-app" id="mlb-en" onclick="setLang('en')">EN</button>
+          <button class="lang-btn-app" id="mlb-zh" onclick="setLang('zh-TW')">繁</button>
+        </div>
         <button class="avatar-btn" onclick="showScreen('profile-screen')">😊</button>
       </div>
-      <div class="filter-bar" id="filter-bar">
-        <div class="filter-chip active" data-sport="all" onclick="filterSport(this,'all')">🏅 すべて</div>
-        <div class="filter-chip" data-sport="tennis" onclick="filterSport(this,'tennis')">🎾 テニス</div>
-        <div class="filter-chip" data-sport="badminton" onclick="filterSport(this,'badminton')">🏸 バドミントン</div>
-        <div class="filter-chip" data-sport="basketball" onclick="filterSport(this,'basketball')">🏀 バスケ</div>
-        <div class="filter-chip" data-sport="tabletennis" onclick="filterSport(this,'tabletennis')">🏓 卓球</div>
-        <div class="filter-chip" data-sport="padel" onclick="filterSport(this,'padel')">🎾 パデル</div>
-      </div>
     </div>
-    <div id="map"></div>
-    <div class="map-bottom-bar">
-      <div class="count-badge" id="count-badge">🎯 5件のアクティビティ</div>
-      <button class="fab" id="fab-btn" onclick="onFabClick()">＋</button>
-    </div>
-    <div class="bottom-nav">
-      <button class="nav-item active" id="nav-map" onclick="switchNav('map')">
-        <span class="nav-icon">🗺️</span>マップ
-      </button>
-      <button class="nav-item" id="nav-notify" onclick="switchNav('notify')" style="position:relative">
-        <span class="nav-icon">🔔</span>通知
-        <div class="nav-badge">2</div>
-      </button>
-      <button class="nav-item" id="nav-profile" onclick="switchNav('profile')">
-        <span class="nav-icon">👤</span>プロフィール
-      </button>
+    <div class="filter-bar" id="filter-bar">
+      <div class="filter-chip active" data-sport="all" onclick="filterSport(this,'all')" data-i18n="filterAll">🏅 すべて</div>
+      <div class="filter-chip" data-sport="tennis" onclick="filterSport(this,'tennis')" data-i18n="filterTennis">🎾 テニス</div>
+      <div class="filter-chip" data-sport="badminton" onclick="filterSport(this,'badminton')" data-i18n="filterBadminton">🏸 バドミントン</div>
+      <div class="filter-chip" data-sport="basketball" onclick="filterSport(this,'basketball')" data-i18n="filterBasketball">🏀 バスケ</div>
+      <div class="filter-chip" data-sport="tabletennis" onclick="filterSport(this,'tabletennis')" data-i18n="filterTabletennis">🏓 卓球</div>
+      <div class="filter-chip" data-sport="padel" onclick="filterSport(this,'padel')" data-i18n="filterPadel">🥎 パデル</div>
     </div>
   </div>
-
-  <!-- ═══════════════════════════════════════
-       SCREEN 3: Notifications
-  ═══════════════════════════════════════ -->
-  <div class="screen" id="notify-screen">
-    <div class="screen-header">
-      <h2>通知</h2>
-    </div>
-    <div class="notif-list">
-      <div class="notif-item unread">
-        <div class="notif-avatar">🎾</div>
-        <div class="notif-content">
-          <div class="notif-title">Alex Chen がマッチングを承認しました</div>
-          <div class="notif-body">今日 15:00〜 台中公園テニスコートで会いましょう！</div>
-          <div class="notif-time">2分前</div>
-        </div>
-      </div>
-      <div class="notif-item unread">
-        <div class="notif-avatar">⭐</div>
-        <div class="notif-content">
-          <div class="notif-title">昨日のプレイのレビューが届きました</div>
-          <div class="notif-body">李 美玲さんから「マナーが良く楽しいプレイでした！」</div>
-          <div class="notif-time">昨日 18:30</div>
-        </div>
-      </div>
-      <div class="notif-item">
-        <div class="notif-avatar">🏀</div>
-        <div class="notif-content">
-          <div class="notif-title">近くに新しいバスケの募集が出ました</div>
-          <div class="notif-body">David Kim — 明日 10:00 豐樂公園</div>
-          <div class="notif-time">1時間前</div>
-        </div>
-      </div>
-      <div class="notif-item">
-        <div class="notif-avatar">🪪</div>
-        <div class="notif-content">
-          <div class="notif-title">本人確認が完了しました</div>
-          <div class="notif-body">eKYCが承認されました。これですべての機能が使えます。</div>
-          <div class="notif-time">3日前</div>
-        </div>
-      </div>
-    </div>
-    <div class="bottom-nav">
-      <button class="nav-item" id="nav-map2" onclick="switchNav('map')"><span class="nav-icon">🗺️</span>マップ</button>
-      <button class="nav-item active" id="nav-notify2" onclick="switchNav('notify')" style="position:relative"><span class="nav-icon">🔔</span>通知</button>
-      <button class="nav-item" id="nav-profile2" onclick="switchNav('profile')"><span class="nav-icon">👤</span>プロフィール</button>
-    </div>
+  <div id="map"></div>
+  <div class="map-bottom-bar">
+    <div class="count-badge" id="count-badge">🎯 5件</div>
+    <button class="fab" id="fab-btn" onclick="onFabClick()">＋</button>
   </div>
-
-  <!-- ═══════════════════════════════════════
-       SCREEN 4: Profile
-  ═══════════════════════════════════════ -->
-  <div class="screen" id="profile-screen">
-    <div class="profile-header">
-      <div class="profile-avatar-lg" id="profile-avatar">😊</div>
-      <div class="profile-name" id="profile-name">ゲストユーザー</div>
-      <div class="profile-role traveler" id="profile-role-badge">✈️ トラベラー</div>
-      <div class="profile-kyc">🪪 本人確認済み</div>
-    </div>
-    <div class="stats-row">
-      <div class="stat-item"><div class="stat-num">12</div><div class="stat-lbl">マッチング数</div></div>
-      <div class="stat-item"><div class="stat-num">4.9</div><div class="stat-lbl">評価</div></div>
-      <div class="stat-item"><div class="stat-num">8</div><div class="stat-lbl">レビュー数</div></div>
-    </div>
-    <div class="profile-section">
-      <h4>スポーツ</h4>
-      <div class="sport-list">
-        <div class="sport-row">
-          <div class="sport-row-left"><span>🎾</span><span>テニス</span></div>
-          <div style="display:flex;gap:10px;align-items:center;flex:1;max-width:160px">
-            <div class="skill-bar-bg"><div class="skill-bar-fill" style="width:70%;background:var(--blue)"></div></div>
-            <span style="font-size:.75rem;color:var(--gray-3);flex-shrink:0">中級</span>
-          </div>
-        </div>
-        <div class="sport-row">
-          <div class="sport-row-left"><span>🏸</span><span>バドミントン</span></div>
-          <div style="display:flex;gap:10px;align-items:center;flex:1;max-width:160px">
-            <div class="skill-bar-bg"><div class="skill-bar-fill" style="width:40%;background:var(--green)"></div></div>
-            <span style="font-size:.75rem;color:var(--gray-3);flex-shrink:0">初級</span>
-          </div>
-        </div>
-        <div class="sport-row">
-          <div class="sport-row-left"><span>🏀</span><span>バスケ</span></div>
-          <div style="display:flex;gap:10px;align-items:center;flex:1;max-width:160px">
-            <div class="skill-bar-bg"><div class="skill-bar-fill" style="width:55%;background:var(--orange)"></div></div>
-            <span style="font-size:.75rem;color:var(--gray-3);flex-shrink:0">初中級</span>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="profile-section">
-      <h4>対応言語</h4>
-      <div class="lang-tags">
-        <span class="lang-tag">🇯🇵 日本語</span>
-        <span class="lang-tag">🇺🇸 English</span>
-      </div>
-    </div>
-    <div class="settings-list">
-      <div class="settings-row"><div class="settings-label"><span>🔔</span>通知設定</div><div class="settings-arrow">›</div></div>
-      <div class="settings-row"><div class="settings-label"><span>🪪</span>本人確認（eKYC）</div><div class="settings-arrow">›</div></div>
-      <div class="settings-row"><div class="settings-label"><span>💳</span>支払い方法</div><div class="settings-arrow">›</div></div>
-      <div class="settings-row" onclick="backToSplash()"><div class="settings-label" style="color:#DC2626"><span>🚪</span>ログアウト</div><div class="settings-arrow">›</div></div>
-    </div>
-    <div style="height:80px"></div>
-    <div class="bottom-nav" style="position:sticky;bottom:0">
-      <button class="nav-item" onclick="switchNav('map')"><span class="nav-icon">🗺️</span>マップ</button>
-      <button class="nav-item" onclick="switchNav('notify')" style="position:relative"><span class="nav-icon">🔔</span>通知<div class="nav-badge">2</div></button>
-      <button class="nav-item active" onclick="switchNav('profile')"><span class="nav-icon">👤</span>プロフィール</button>
-    </div>
+  <div class="bottom-nav">
+    <button class="nav-item active" onclick="switchNav('map')"><span class="nav-icon">🗺️</span><span data-i18n="navMap">マップ</span></button>
+    <button class="nav-item" onclick="switchNav('notify')" style="position:relative"><span class="nav-icon">🔔</span><span data-i18n="navNotify">通知</span><div class="nav-badge">2</div></button>
+    <button class="nav-item" onclick="switchNav('profile')"><span class="nav-icon">👤</span><span data-i18n="navProfile">プロフィール</span></button>
   </div>
+</div>
 
-  <!-- ═══════════════════════════════════════
-       SCREEN 5: Create Listing (Local)
-  ═══════════════════════════════════════ -->
-  <div class="screen" id="create-screen">
-    <div class="create-header">
-      <button class="back-btn" onclick="showScreen('map-screen')">←</button>
-      <h2>募集を作成</h2>
-    </div>
-    <div class="create-form">
-      <div class="form-group">
-        <label>スポーツ種目</label>
-        <select>
-          <option>🎾 テニス</option>
-          <option>🏸 バドミントン</option>
-          <option>🏀 バスケットボール</option>
-          <option>🏓 卓球</option>
-          <option>🎾 パデル</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>施設・場所</label>
-        <input type="text" placeholder="例：台中公園テニスコート" value="台中公園テニスコート">
-      </div>
-      <div class="form-group">
-        <label>日時</label>
-        <input type="text" placeholder="例：今日 15:00〜16:30" value="今日 15:00〜16:30">
-      </div>
-      <div class="form-group">
-        <label>スキルレベル</label>
-        <select>
-          <option>🌱 初心者歓迎</option>
-          <option selected>🎯 中級者</option>
-          <option>🔥 上級者</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>対応言語</label>
-        <select>
-          <option>中文 / English</option>
-          <option>中文 / 日本語</option>
-          <option>English only</option>
-          <option>中文 / English / 日本語</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>費用分担</label>
-        <div class="cost-options">
-          <label class="cost-option">
-            <input type="radio" name="cost" checked>
-            <span>💰 割り勘（例：コート代 NT$300 → 各 NT$150）</span>
-          </label>
-          <label class="cost-option">
-            <input type="radio" name="cost">
-            <span>🎁 ゲストにおごる（施設費は自分が負担）</span>
-          </label>
-          <label class="cost-option">
-            <input type="radio" name="cost">
-            <span>🙏 ゲストにおごってもらう</span>
-          </label>
-        </div>
-      </div>
-    </div>
-    <div class="create-footer">
-      <button class="btn-publish" onclick="publishListing()">📍 地図に公開する</button>
-    </div>
+<!-- ── NOTIFICATIONS ── -->
+<div class="screen" id="notify-screen">
+  <div class="screen-header"><h2 data-i18n="notifyTitle">通知</h2></div>
+  <div class="notif-list" id="notif-list"></div>
+  <div class="bottom-nav">
+    <button class="nav-item" onclick="switchNav('map')"><span class="nav-icon">🗺️</span><span data-i18n="navMap">マップ</span></button>
+    <button class="nav-item active" onclick="switchNav('notify')" style="position:relative"><span class="nav-icon">🔔</span><span data-i18n="navNotify">通知</span></button>
+    <button class="nav-item" onclick="switchNav('profile')"><span class="nav-icon">👤</span><span data-i18n="navProfile">プロフィール</span></button>
   </div>
+</div>
 
-  <!-- ═══════════════════════════════════════
-       OVERLAY A: Activity Card
-  ═══════════════════════════════════════ -->
-  <div class="overlay" id="card-overlay">
-    <div class="card-backdrop" onclick="closeCard()"></div>
-    <div class="card-sheet">
-      <div class="card-handle"></div>
-      <div class="card-scroll" id="card-content">
-        <!-- filled by JS -->
-      </div>
-      <div class="card-footer">
-        <button class="btn-request" onclick="openRequest()">📩 マッチングリクエストを送る</button>
+<!-- ── PROFILE ── -->
+<div class="screen" id="profile-screen">
+  <div class="profile-header">
+    <div class="profile-avatar-lg" id="profile-avatar">😊</div>
+    <div class="profile-name" id="profile-name">Guest</div>
+    <div class="profile-role traveler" id="profile-role-badge">✈️ トラベラー</div>
+    <div class="profile-kyc">🪪 <span data-i18n="kycVerified">本人確認済み</span></div>
+    <div class="lang-section">
+      <span data-i18n="langLabel">言語：</span>
+      <div class="lang-toggle-profile">
+        <button class="lang-btn-p active" id="plb-ja" onclick="setLang('ja')">日本語</button>
+        <button class="lang-btn-p" id="plb-en" onclick="setLang('en')">English</button>
+        <button class="lang-btn-p" id="plb-zh" onclick="setLang('zh-TW')">繁體中文</button>
       </div>
     </div>
   </div>
-
-  <!-- ═══════════════════════════════════════
-       OVERLAY B: Request Confirmation
-  ═══════════════════════════════════════ -->
-  <div class="overlay" id="request-overlay">
-    <div class="request-modal">
-      <div class="modal-title">リクエストを送りますか？</div>
-      <div class="modal-sub">相手が承認するとマッチング成立です。<br>費用分担や持ち物を事前にご確認ください。</div>
-      <div class="confirm-player" id="confirm-player-info">
-        <!-- filled by JS -->
-      </div>
-      <div class="btn-row">
-        <button class="btn-cancel" onclick="closeRequest()">キャンセル</button>
-        <button class="btn-confirm" onclick="sendRequest()">送る →</button>
-      </div>
+  <div class="stats-row">
+    <div class="stat-item"><div class="stat-num">12</div><div class="stat-lbl" data-i18n="statMatches">マッチング数</div></div>
+    <div class="stat-item"><div class="stat-num">4.9</div><div class="stat-lbl" data-i18n="statRating">評価</div></div>
+    <div class="stat-item"><div class="stat-num">8</div><div class="stat-lbl" data-i18n="statReviews">レビュー数</div></div>
+  </div>
+  <div class="profile-section">
+    <h4 data-i18n="profileSports">スポーツ</h4>
+    <div class="sport-list">
+      <div class="sport-row"><div class="sport-row-left"><span>🎾</span><span data-i18n="filterTennis">テニス</span></div><div style="display:flex;gap:10px;align-items:center;flex:1;max-width:160px"><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:70%;background:var(--blue)"></div></div><span style="font-size:.75rem;color:var(--gray-3);flex-shrink:0" data-i18n="skillMid">中級</span></div></div>
+      <div class="sport-row"><div class="sport-row-left"><span>🏸</span><span data-i18n="filterBadminton">バドミントン</span></div><div style="display:flex;gap:10px;align-items:center;flex:1;max-width:160px"><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:40%;background:var(--green)"></div></div><span style="font-size:.75rem;color:var(--gray-3);flex-shrink:0" data-i18n="skillBeg">初級</span></div></div>
+      <div class="sport-row"><div class="sport-row-left"><span>🏀</span><span data-i18n="filterBasketball">バスケ</span></div><div style="display:flex;gap:10px;align-items:center;flex:1;max-width:160px"><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:55%;background:var(--orange)"></div></div><span style="font-size:.75rem;color:var(--gray-3);flex-shrink:0" data-i18n="skillBegMid">初中級</span></div></div>
     </div>
   </div>
-
-  <!-- ═══════════════════════════════════════
-       OVERLAY C: Matching Animation
-  ═══════════════════════════════════════ -->
-  <div class="overlay" id="matching-overlay">
-    <div class="matching-anim">
-      <div class="matching-ring"></div>
-      <div class="matching-ring"></div>
-      <div class="matching-icon" id="matching-icon">🎾</div>
-    </div>
-    <div class="matching-text">マッチング中<span class="matching-dots"></span></div>
+  <div class="profile-section">
+    <h4 data-i18n="profileLangs">対応言語</h4>
+    <div class="lang-tags"><span class="lang-tag">🇯🇵 日本語</span><span class="lang-tag">🇺🇸 English</span></div>
   </div>
-
-  <!-- ═══════════════════════════════════════
-       OVERLAY D: Match Confirmed
-  ═══════════════════════════════════════ -->
-  <div class="overlay" id="matched-overlay">
-    <div class="matched-emoji">🎉</div>
-    <div class="matched-title">マッチング成立！</div>
-    <div class="matched-sub">現地での交流を楽しんでください。<br>プレイ後はお互いをレビューしましょう。</div>
-    <div class="matched-card" id="matched-detail">
-      <!-- filled by JS -->
-    </div>
-    <button class="btn-review" onclick="openReview()">⭐ レビューを書く</button>
-    <button class="btn-done" onclick="closeMatched()" style="margin-top:10px">マップに戻る</button>
+  <div class="settings-list">
+    <div class="settings-row"><div class="settings-label"><span>🔔</span><span data-i18n="settingNotif">通知設定</span></div><div class="settings-arrow">›</div></div>
+    <div class="settings-row"><div class="settings-label"><span>🪪</span><span data-i18n="settingKYC">本人確認（eKYC）</span></div><div class="settings-arrow">›</div></div>
+    <div class="settings-row"><div class="settings-label"><span>💳</span><span data-i18n="settingPayment">支払い方法</span></div><div class="settings-arrow">›</div></div>
+    <div class="settings-row" onclick="backToSplash()"><div class="settings-label" style="color:#DC2626"><span>🚪</span><span data-i18n="settingLogout">ログアウト</span></div><div class="settings-arrow">›</div></div>
   </div>
+  <div style="height:80px"></div>
+  <div class="bottom-nav" style="position:sticky;bottom:0">
+    <button class="nav-item" onclick="switchNav('map')"><span class="nav-icon">🗺️</span><span data-i18n="navMap">マップ</span></button>
+    <button class="nav-item" onclick="switchNav('notify')" style="position:relative"><span class="nav-icon">🔔</span><span data-i18n="navNotify">通知</span><div class="nav-badge">2</div></button>
+    <button class="nav-item active" onclick="switchNav('profile')"><span class="nav-icon">👤</span><span data-i18n="navProfile">プロフィール</span></button>
+  </div>
+</div>
 
-  <!-- ═══════════════════════════════════════
-       OVERLAY E: Review
-  ═══════════════════════════════════════ -->
-  <div class="overlay" id="review-overlay">
-    <div class="review-modal">
-      <div class="modal-title" style="margin-bottom:16px">プレイを評価する</div>
-      <div class="review-player" id="review-player-info"></div>
-      <div class="review-categories">
-        <div class="review-cat">
-          <div class="review-cat-label">マナー</div>
-          <div class="star-row" data-cat="manner">
-            <span class="star" onclick="rateStar(this,1)">★</span>
-            <span class="star" onclick="rateStar(this,2)">★</span>
-            <span class="star" onclick="rateStar(this,3)">★</span>
-            <span class="star" onclick="rateStar(this,4)">★</span>
-            <span class="star" onclick="rateStar(this,5)">★</span>
-          </div>
-        </div>
-        <div class="review-cat">
-          <div class="review-cat-label">スキル</div>
-          <div class="star-row" data-cat="skill">
-            <span class="star" onclick="rateStar(this,1)">★</span>
-            <span class="star" onclick="rateStar(this,2)">★</span>
-            <span class="star" onclick="rateStar(this,3)">★</span>
-            <span class="star" onclick="rateStar(this,4)">★</span>
-            <span class="star" onclick="rateStar(this,5)">★</span>
-          </div>
-        </div>
-        <div class="review-cat">
-          <div class="review-cat-label">コミュニケーション</div>
-          <div class="star-row" data-cat="comm">
-            <span class="star" onclick="rateStar(this,1)">★</span>
-            <span class="star" onclick="rateStar(this,2)">★</span>
-            <span class="star" onclick="rateStar(this,3)">★</span>
-            <span class="star" onclick="rateStar(this,4)">★</span>
-            <span class="star" onclick="rateStar(this,5)">★</span>
-          </div>
-        </div>
-      </div>
-      <button class="btn-submit-review" onclick="submitReview()">レビューを送信 →</button>
+<!-- ── CREATE (Local) ── -->
+<div class="screen" id="create-screen">
+  <div class="create-header">
+    <button class="back-btn" onclick="showScreen('map-screen')">←</button>
+    <h2 data-i18n="createTitle">募集を作成</h2>
+  </div>
+  <div class="create-form" id="create-form-body"></div>
+  <div class="create-footer">
+    <button class="btn-publish" onclick="publishListing()" data-i18n="createPublish">📍 地図に公開する</button>
+  </div>
+</div>
+
+<!-- ── OVERLAYS ── -->
+<div class="overlay" id="card-overlay">
+  <div class="card-backdrop" onclick="closeCard()"></div>
+  <div class="card-sheet">
+    <div class="card-handle"></div>
+    <div class="card-scroll" id="card-content"></div>
+    <div class="card-footer">
+      <button class="btn-request" onclick="openRequest()" data-i18n="btnRequest">📩 マッチングリクエストを送る</button>
     </div>
   </div>
+</div>
 
-</div><!-- #app -->
-</div><!-- #app-frame -->
+<div class="overlay" id="request-overlay">
+  <div class="request-modal">
+    <div class="modal-title" data-i18n="reqTitle">リクエストを送りますか？</div>
+    <div class="modal-sub" data-i18n="reqSub">相手が承認するとマッチング成立です。費用分担や持ち物を事前にご確認ください。</div>
+    <div class="confirm-player" id="confirm-player-info"></div>
+    <div class="btn-row">
+      <button class="btn-cancel" onclick="closeRequest()" data-i18n="btnCancel">キャンセル</button>
+      <button class="btn-confirm" onclick="sendRequest()" data-i18n="btnSend">送る →</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="matching-overlay">
+  <div class="matching-anim"><div class="matching-ring"></div><div class="matching-ring"></div><div class="matching-icon" id="matching-icon">🎾</div></div>
+  <div class="matching-text" data-i18n="matchingText">マッチング中</div>
+</div>
+
+<div class="overlay" id="matched-overlay">
+  <div class="matched-emoji">🎉</div>
+  <div class="matched-title" data-i18n="matchedTitle">マッチング成立！</div>
+  <div class="matched-sub" data-i18n="matchedSub">現地での交流を楽しんでください。プレイ後はお互いをレビューしましょう。</div>
+  <div class="matched-card" id="matched-detail"></div>
+  <button class="btn-review" onclick="openReview()" data-i18n="btnReview">⭐ レビューを書く</button>
+  <button class="btn-done" onclick="closeMatched()" style="margin-top:10px" data-i18n="btnBackMap">マップに戻る</button>
+</div>
+
+<div class="overlay" id="review-overlay">
+  <div class="review-modal">
+    <div class="modal-title" style="margin-bottom:16px" data-i18n="reviewTitle">プレイを評価する</div>
+    <div class="review-player" id="review-player-info"></div>
+    <div class="review-categories" id="review-cats"></div>
+    <button class="btn-submit-review" onclick="submitReview()" data-i18n="btnSubmitReview">レビューを送信 →</button>
+  </div>
+</div>
+
+</div></div>
 
 <script>
-// ────────────────────────────
-// Data
-// ────────────────────────────
-const sportConfig = {
-  tennis:      { emoji: '🎾', label: 'テニス',      color: '#1A56DB' },
-  badminton:   { emoji: '🏸', label: 'バドミントン', color: '#0E9F6E' },
-  basketball:  { emoji: '🏀', label: 'バスケ',       color: '#FF5A1F' },
-  tabletennis: { emoji: '🏓', label: '卓球',         color: '#7C3AED' },
-  padel:       { emoji: '🎾', label: 'パデル',       color: '#DC2626' },
+// ── Translations ──────────────────────────────────────────
+const T = {
+  ja: {
+    tagline:'旅先でスポーツ仲間を、今すぐ。',
+    splashQ:'あなたはどちらですか？',
+    rcTravelerTitle:'トラベラー', rcTravelerBody:'旅行・出張先で現地のスポーツ仲間を探したい',
+    rcLocalTitle:'ローカル', rcLocalBody:'旅行者と交流しながらスポーツしたい',
+    filterAll:'🏅 すべて', filterTennis:'🎾 テニス', filterBadminton:'🏸 バドミントン',
+    filterBasketball:'🏀 バスケ', filterTabletennis:'🏓 卓球', filterPadel:'🥎 パデル',
+    countBadge:'🎯 {n}件のアクティビティ',
+    navMap:'マップ', navNotify:'通知', navProfile:'プロフィール',
+    notifyTitle:'通知',
+    kycVerified:'本人確認済み', langLabel:'言語：',
+    statMatches:'マッチング数', statRating:'評価', statReviews:'レビュー数',
+    profileSports:'スポーツ', profileLangs:'対応言語',
+    skillBeg:'初級', skillBegMid:'初中級', skillMid:'中級', skillAdv:'上級',
+    settingNotif:'通知設定', settingKYC:'本人確認（eKYC）', settingPayment:'支払い方法', settingLogout:'ログアウト',
+    createTitle:'募集を作成', createPublish:'📍 地図に公開する',
+    createSportLabel:'スポーツ種目', createVenueLabel:'施設・場所', createTimeLabel:'日時',
+    createSkillLabel:'スキルレベル', createLangLabel:'対応言語', createCostLabel:'費用分担',
+    createCostSplit:'💰 割り勘', createCostGuestPays:'🎁 ゲストにおごる', createCostHostPays:'🙏 ゲストにおごってもらう',
+    btnRequest:'📩 マッチングリクエストを送る',
+    reqTitle:'リクエストを送りますか？', reqSub:'相手が承認するとマッチング成立です。費用分担や持ち物を事前にご確認ください。',
+    btnCancel:'キャンセル', btnSend:'送る →',
+    matchingText:'マッチング中',
+    matchedTitle:'マッチング成立！', matchedSub:'現地での交流を楽しんでください。プレイ後はお互いをレビューしましょう。',
+    btnReview:'⭐ レビューを書く', btnBackMap:'マップに戻る',
+    reviewTitle:'プレイを評価する',
+    reviewCats:['マナー','スキル','コミュニケーション'],
+    btnSubmitReview:'レビューを送信 →',
+    toastPublished:'📍 募集を地図に公開しました！',
+    toastRefreshed:'📍 現在地周辺を更新しました',
+    toastReviewed:'⭐ レビューを送信しました！ありがとうございます',
+    travelerNameLabel:'トラベラーさん', localNameLabel:'ローカルさん',
+    travelerRoleBadge:'✈️ トラベラー', localRoleBadge:'🏠 ローカル',
+    cardLabelDatePlace:'日時・場所', cardLabelSkillLang:'スキル・言語', cardLabelCost:'費用分担', cardLabelGear:'持ち物', cardLabelBio:'一言',
+    notifItems:[
+      {icon:'🎾',title:'Alex Chen がマッチングを承認しました',body:'今日 15:00〜 台中公園テニスコートで会いましょう！',time:'2分前',unread:true},
+      {icon:'⭐',title:'昨日のプレイのレビューが届きました',body:'李 美玲さんから「マナーが良く楽しいプレイでした！」',time:'昨日 18:30',unread:true},
+      {icon:'🏀',title:'近くに新しいバスケの募集が出ました',body:'David Kim — 明日 10:00 豐樂公園',time:'1時間前',unread:false},
+      {icon:'🪪',title:'本人確認が完了しました',body:'eKYCが承認されました。これですべての機能が使えます。',time:'3日前',unread:false},
+    ],
+  },
+  en: {
+    tagline:'Find sports partners in your travel city, right now.',
+    splashQ:'Who are you?',
+    rcTravelerTitle:'Traveler', rcTravelerBody:'Looking for local sports partners while traveling or on a business trip',
+    rcLocalTitle:'Local', rcLocalBody:'Want to play sports and meet travelers',
+    filterAll:'🏅 All', filterTennis:'🎾 Tennis', filterBadminton:'🏸 Badminton',
+    filterBasketball:'🏀 Basketball', filterTabletennis:'🏓 Table Tennis', filterPadel:'🥎 Padel',
+    countBadge:'🎯 {n} activities nearby',
+    navMap:'Map', navNotify:'Alerts', navProfile:'Profile',
+    notifyTitle:'Notifications',
+    kycVerified:'Identity verified', langLabel:'Language:',
+    statMatches:'Matches', statRating:'Rating', statReviews:'Reviews',
+    profileSports:'Sports', profileLangs:'Languages',
+    skillBeg:'Beginner', skillBegMid:'Beg–Mid', skillMid:'Intermediate', skillAdv:'Advanced',
+    settingNotif:'Notifications', settingKYC:'Identity (eKYC)', settingPayment:'Payment', settingLogout:'Log out',
+    createTitle:'Create a listing', createPublish:'📍 Post to map',
+    createSportLabel:'Sport', createVenueLabel:'Venue', createTimeLabel:'Date & Time',
+    createSkillLabel:'Skill level', createLangLabel:'Languages', createCostLabel:'Cost sharing',
+    createCostSplit:'💰 Split evenly', createCostGuestPays:'🎁 I\'ll treat the guest', createCostHostPays:'🙏 Guest treats me',
+    btnRequest:'📩 Send match request',
+    reqTitle:'Send match request?', reqSub:'The match is confirmed once they accept. Check the cost and gear details first.',
+    btnCancel:'Cancel', btnSend:'Send →',
+    matchingText:'Finding a match',
+    matchedTitle:'It\'s a match!', matchedSub:"Enjoy the game! Don't forget to review each other afterward.",
+    btnReview:'⭐ Write a review', btnBackMap:'Back to map',
+    reviewTitle:'Rate this session',
+    reviewCats:['Manner','Skill','Communication'],
+    btnSubmitReview:'Submit review →',
+    toastPublished:'📍 Your listing is live on the map!',
+    toastRefreshed:'📍 Refreshed activities near you',
+    toastReviewed:"⭐ Review submitted! Thank you.",
+    travelerNameLabel:'Traveler', localNameLabel:'Local',
+    travelerRoleBadge:'✈️ Traveler', localRoleBadge:'🏠 Local',
+    cardLabelDatePlace:'When & Where', cardLabelSkillLang:'Skill & Language', cardLabelCost:'Cost sharing', cardLabelGear:'Gear', cardLabelBio:'About',
+    notifItems:[
+      {icon:'🎾',title:'Alex Chen accepted your request',body:'See you at Taichung Park Tennis Court at 15:00 today!',time:'2 min ago',unread:true},
+      {icon:'⭐',title:"You received a review from yesterday's game",body:'Mei-Ling Li: "Great manners and a fun match!"',time:'Yesterday 18:30',unread:true},
+      {icon:'🏀',title:'New basketball listing nearby',body:'David Kim — Tomorrow 10:00, Fongle Park',time:'1 hour ago',unread:false},
+      {icon:'🪪',title:'Identity verification complete',body:'Your eKYC has been approved. All features are now unlocked.',time:'3 days ago',unread:false},
+    ],
+  },
+  'zh-TW': {
+    tagline:'在旅行目的地找到運動夥伴，就是現在。',
+    splashQ:'您是哪種用戶？',
+    rcTravelerTitle:'旅行者', rcTravelerBody:'在旅行或出差途中尋找現地運動夥伴',
+    rcLocalTitle:'本地居民', rcLocalBody:'想一邊運動一邊與旅行者交流',
+    filterAll:'🏅 全部', filterTennis:'🎾 網球', filterBadminton:'🏸 羽毛球',
+    filterBasketball:'🏀 籃球', filterTabletennis:'🏓 桌球', filterPadel:'🥎 匹球',
+    countBadge:'🎯 附近 {n} 個活動',
+    navMap:'地圖', navNotify:'通知', navProfile:'個人檔案',
+    notifyTitle:'通知',
+    kycVerified:'已完成身份驗證', langLabel:'語言：',
+    statMatches:'配對次數', statRating:'評分', statReviews:'評價數',
+    profileSports:'運動', profileLangs:'可溝通語言',
+    skillBeg:'初學', skillBegMid:'初中級', skillMid:'中級', skillAdv:'進階',
+    settingNotif:'通知設定', settingKYC:'身份驗證（eKYC）', settingPayment:'付款方式', settingLogout:'登出',
+    createTitle:'建立招募', createPublish:'📍 發布到地圖',
+    createSportLabel:'運動項目', createVenueLabel:'場地', createTimeLabel:'日期與時間',
+    createSkillLabel:'技術程度', createLangLabel:'可溝通語言', createCostLabel:'費用分擔',
+    createCostSplit:'💰 平均分攤', createCostGuestPays:'🎁 我請客人', createCostHostPays:'🙏 客人請我',
+    btnRequest:'📩 發送配對請求',
+    reqTitle:'確認發送配對請求？', reqSub:'對方接受後即完成配對。請事先確認費用分擔與器材。',
+    btnCancel:'取消', btnSend:'發送 →',
+    matchingText:'配對中',
+    matchedTitle:'配對成功！', matchedSub:'祝您享受愉快的運動時光！運動結束後別忘了互相評價。',
+    btnReview:'⭐ 寫評價', btnBackMap:'返回地圖',
+    reviewTitle:'評價這次運動',
+    reviewCats:['禮儀','技術','溝通'],
+    btnSubmitReview:'提交評價 →',
+    toastPublished:'📍 招募已發布到地圖！',
+    toastRefreshed:'📍 已更新附近活動',
+    toastReviewed:'⭐ 評價已送出！謝謝。',
+    travelerNameLabel:'旅行者', localNameLabel:'本地居民',
+    travelerRoleBadge:'✈️ 旅行者', localRoleBadge:'🏠 本地居民',
+    cardLabelDatePlace:'時間與地點', cardLabelSkillLang:'技術與語言', cardLabelCost:'費用分擔', cardLabelGear:'器材', cardLabelBio:'自我介紹',
+    notifItems:[
+      {icon:'🎾',title:'Alex Chen 接受了您的配對請求',body:'今天15:00，台中公園網球場見！',time:'2分鐘前',unread:true},
+      {icon:'⭐',title:'收到昨天運動的評價',body:'李 美玲：「禮儀很好，打球很愉快！」',time:'昨天 18:30',unread:true},
+      {icon:'🏀',title:'附近有新的籃球招募',body:'David Kim — 明天 10:00，豐樂公園',time:'1小時前',unread:false},
+      {icon:'🪪',title:'身份驗證已完成',body:'您的eKYC已通過審核，所有功能現已開放。',time:'3天前',unread:false},
+    ],
+  }
 };
 
+// ── Player data (multilingual) ───────────────────────────
 const players = [
   {
-    id: 1, name: 'Alex Chen', avatar: '😎', age: '28',
-    sport: 'tennis', lat: 24.1600, lng: 120.6780,
-    venue: '台中公園テニスコート', time: '今日 15:00〜16:30',
-    languages: ['English', '中文'], skill: '中級者', skillColor: '#FF8C00',
-    cost: '割り勘（コート代 NT$150/人）', costIcon: '💰',
-    gear: 'ラケット貸出可 ✓', rating: 4.8, reviews: 23, verified: true,
-    bio: '台北出身、台中在住5年。週3でテニスをしています。旅行者と気軽にラリーを楽しみたいです！',
+    id:1,name:'Alex Chen',avatar:'😎',age:'28',sport:'tennis',lat:24.1600,lng:120.6780,
+    venue:{ja:'台中公園テニスコート',en:'Taichung Park Tennis Court','zh-TW':'台中公園網球場'},
+    time:{ja:'今日 15:00〜16:30',en:'Today 15:00–16:30','zh-TW':'今日 15:00〜16:30'},
+    languages:['English','中文'],
+    skill:{ja:'中級者',en:'Intermediate','zh-TW':'中級'},skillColor:'#FF8C00',
+    cost:{ja:'割り勘（コート代 NT$150/人）',en:'Split evenly (NT$150/person)','zh-TW':'平均分攤（場地費 NT$150/人）'},costIcon:'💰',
+    gear:{ja:'ラケット貸出可 ✓',en:'Racket available ✓','zh-TW':'可借球拍 ✓'},
+    rating:4.8,reviews:23,verified:true,
+    bio:{ja:'台北出身、台中在住5年。週3でテニスをしています。旅行者と気軽にラリーを楽しみたいです！',
+         en:"From Taipei, in Taichung for 5 years. I play 3x/week. Would love a casual rally with travelers!",
+         'zh-TW':'來自台北，在台中住了5年。每週打3次球，很想和旅行者輕鬆打球！'},
   },
   {
-    id: 2, name: '李 美玲', avatar: '🙋', age: '25',
-    sport: 'badminton', lat: 24.1450, lng: 120.6850,
-    venue: '台中市立体育館', time: '今日 16:30〜18:00',
-    languages: ['中文', '日本語すこし'], skill: '初心者歓迎', skillColor: '#0E9F6E',
-    cost: 'ゲストにおごります（施設費 NT$80 負担）', costIcon: '🎁',
-    gear: 'シャトル・ラケット貸出可 ✓', rating: 4.9, reviews: 41, verified: true,
-    bio: '大学でバドミントン部でした。旅行者と交流しながら語学練習したいです。日本語勉強中！',
+    id:2,name:'李 美玲',avatar:'🙋',age:'25',sport:'badminton',lat:24.1450,lng:120.6850,
+    venue:{ja:'台中市立体育館',en:'Taichung Municipal Gymnasium','zh-TW':'台中市立體育館'},
+    time:{ja:'今日 16:30〜18:00',en:'Today 16:30–18:00','zh-TW':'今日 16:30〜18:00'},
+    languages:['中文','日本語すこし'],
+    skill:{ja:'初心者歓迎',en:'Beginners welcome','zh-TW':'歡迎初學者'},skillColor:'#0E9F6E',
+    cost:{ja:'ゲストにおごります（施設費 NT$80 負担）',en:"I'll cover the facility fee (NT$80)",'zh-TW':'我請客（場地費 NT$80 由我負擔）'},costIcon:'🎁',
+    gear:{ja:'シャトル・ラケット貸出可 ✓',en:'Shuttlecock & racket available ✓','zh-TW':'羽毛球與球拍均可借 ✓'},
+    rating:4.9,reviews:41,verified:true,
+    bio:{ja:'大学でバドミントン部でした。旅行者と交流しながら語学練習したいです。日本語勉強中！',
+         en:'I played badminton in college. Love meeting travelers while practicing languages. Learning Japanese!',
+         'zh-TW':'大學時是羽球社。很喜歡和旅行者交流同時練習語言。正在學日語！'},
   },
   {
-    id: 3, name: 'David Kim', avatar: '🏋️', age: '31',
-    sport: 'basketball', lat: 24.1350, lng: 120.6700,
-    venue: '豐樂公園バスケコート', time: '明日 10:00〜12:00',
-    languages: ['English'], skill: '上級者', skillColor: '#DC2626',
-    cost: '割り勘（無料コート、飲み物代各自）', costIcon: '💰',
-    gear: 'ボールあり ✓', rating: 4.7, reviews: 15, verified: true,
-    bio: 'ソウル出身で台中在住3年。3on3をよくやっています。英語で気軽に話しかけてください！',
+    id:3,name:'David Kim',avatar:'🏋️',age:'31',sport:'basketball',lat:24.1350,lng:120.6700,
+    venue:{ja:'豐樂公園バスケコート',en:'Fongle Park Basketball Court','zh-TW':'豐樂公園籃球場'},
+    time:{ja:'明日 10:00〜12:00',en:'Tomorrow 10:00–12:00','zh-TW':'明日 10:00〜12:00'},
+    languages:['English'],
+    skill:{ja:'上級者',en:'Advanced','zh-TW':'進階'},skillColor:'#DC2626',
+    cost:{ja:'割り勘（無料コート）',en:'Split (free court, bring your own drinks)','zh-TW':'平均分攤（免費球場）'},costIcon:'💰',
+    gear:{ja:'ボールあり ✓',en:'Ball provided ✓','zh-TW':'有球 ✓'},
+    rating:4.7,reviews:15,verified:true,
+    bio:{ja:'ソウル出身で台中在住3年。3on3をよくやっています。英語で気軽に話しかけてください！',
+         en:"From Seoul, 3 years in Taichung. I'm into 3-on-3. Feel free to chat in English!",
+         'zh-TW':'來自首爾，在台中住了3年。喜歡3對3。請用英語來找我！'},
   },
   {
-    id: 4, name: '陳 志偉', avatar: '🧑', age: '35',
-    sport: 'tabletennis', lat: 24.1500, lng: 120.6620,
-    venue: '緑川文化センター', time: '今日 18:00〜19:30',
-    languages: ['中文'], skill: '中級者', skillColor: '#FF8C00',
-    cost: '無料（施設は公共）', costIcon: '✨',
-    gear: 'ラケット1本貸出可 ✓', rating: 4.6, reviews: 9, verified: true,
-    bio: '台中生まれの台中育ち。近所の卓球仲間を探しています。中文のみですがジェスチャーで頑張ります！',
+    id:4,name:'陳 志偉',avatar:'🧑',age:'35',sport:'tabletennis',lat:24.1500,lng:120.6620,
+    venue:{ja:'緑川文化センター',en:'Lyuchuan Cultural Center','zh-TW':'綠川文化中心'},
+    time:{ja:'今日 18:00〜19:30',en:'Today 18:00–19:30','zh-TW':'今日 18:00〜19:30'},
+    languages:['中文'],
+    skill:{ja:'中級者',en:'Intermediate','zh-TW':'中級'},skillColor:'#FF8C00',
+    cost:{ja:'無料（公共施設）',en:'Free (public facility)','zh-TW':'免費（公共設施）'},costIcon:'✨',
+    gear:{ja:'ラケット1本貸出可 ✓',en:'1 racket to lend ✓','zh-TW':'可借1支球拍 ✓'},
+    rating:4.6,reviews:9,verified:true,
+    bio:{ja:'台中生まれの台中育ち。中文のみですがジェスチャーで頑張ります！',
+         en:"Born and raised in Taichung. Mandarin only, but I'll make up for it with gestures!",
+         'zh-TW':'在台中土生土長。只會說中文，但我會用肢體語言溝通！'},
   },
   {
-    id: 5, name: 'Emma Walsh', avatar: '🧑‍🦱', age: '29',
-    sport: 'padel', lat: 24.1560, lng: 120.6900,
-    venue: 'Taichung Padel Club', time: '明日 09:00〜11:00',
-    languages: ['English', '中文'], skill: '初心者歓迎', skillColor: '#0E9F6E',
-    cost: '割り勘（コート代 NT$200/人）', costIcon: '💰',
-    gear: 'ラケット2本貸出可 ✓', rating: 5.0, reviews: 7, verified: true,
-    bio: 'アイルランド出身でパデルが大好き！台中でパデルを広めたいと思っています。初心者でも全然OK！',
+    id:5,name:'Emma Walsh',avatar:'🧑‍🦱',age:'29',sport:'padel',lat:24.1560,lng:120.6900,
+    venue:{ja:'Taichung Padel Club',en:'Taichung Padel Club','zh-TW':'台中匹球俱樂部'},
+    time:{ja:'明日 09:00〜11:00',en:'Tomorrow 09:00–11:00','zh-TW':'明日 09:00〜11:00'},
+    languages:['English','中文'],
+    skill:{ja:'初心者歓迎',en:'Beginners welcome','zh-TW':'歡迎初學者'},skillColor:'#0E9F6E',
+    cost:{ja:'割り勘（コート代 NT$200/人）',en:'Split evenly (NT$200/person)','zh-TW':'平均分攤（場地費 NT$200/人）'},costIcon:'💰',
+    gear:{ja:'ラケット2本貸出可 ✓',en:'2 rackets to lend ✓','zh-TW':'可借2支球拍 ✓'},
+    rating:5.0,reviews:7,verified:true,
+    bio:{ja:'アイルランド出身でパデルが大好き！台中でパデルを広めたいです。初心者OK！',
+         en:"Irish, padel fanatic! I want to spread padel love in Taichung. Total beginners are very welcome!",
+         'zh-TW':'來自愛爾蘭的匹球狂熱者！想在台中推廣匹球，完全初學者也歡迎！'},
   },
 ];
 
-// ────────────────────────────
-// State
-// ────────────────────────────
+const sportConfig = {
+  tennis:     {emoji:'🎾',color:'#1A56DB'},
+  badminton:  {emoji:'🏸',color:'#0E9F6E'},
+  basketball: {emoji:'🏀',color:'#FF5A1F'},
+  tabletennis:{emoji:'🏓',color:'#7C3AED'},
+  padel:      {emoji:'🥎',color:'#DC2626'},
+};
+
+// ── State ───────────────────────────────────────────────
+let currentLang = localStorage.getItem('pm-lang') || 'ja';
 let currentRole = 'traveler';
 let currentPlayer = null;
 let leafletMap = null;
 let markers = [];
 let activeFilter = 'all';
 
-// ────────────────────────────
-// Navigation
-// ────────────────────────────
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active', 'slide-left'));
-  document.getElementById(id).classList.add('active');
+// ── i18n engine ─────────────────────────────────────────
+function setLang(lang) {
+  currentLang = lang;
+  localStorage.setItem('pm-lang', lang);
+  document.documentElement.lang = lang;
+
+  // Update all toggle buttons
+  const sets = [
+    ['alb-ja','alb-en','alb-zh'],
+    ['mlb-ja','mlb-en','mlb-zh'],
+    ['plb-ja','plb-en','plb-zh'],
+  ];
+  sets.forEach(ids => {
+    ids.forEach((id, i) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const l = i===0?'ja':i===1?'en':'zh-TW';
+      el.classList.toggle('active', l===lang);
+    });
+  });
+
+  const t = T[lang];
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const k = el.dataset.i18n;
+    if (t[k] !== undefined) el.textContent = t[k];
+  });
+
+  // Rebuild notification list
+  renderNotifications();
+  // Rebuild create form
+  renderCreateForm();
+  // Update count badge
+  updateCountBadge();
 }
 
+function t(key) { return T[currentLang][key] || T['ja'][key] || key; }
+function tl(obj) { return obj[currentLang] || obj['ja'] || ''; }
+
+// ── Navigation ───────────────────────────────────────────
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
 function backToSplash() {
   document.querySelectorAll('.overlay').forEach(o => o.classList.remove('show'));
   showScreen('splash');
 }
-
 function switchNav(tab) {
-  if (tab === 'map')     { showScreen('map-screen');     }
-  if (tab === 'notify')  { showScreen('notify-screen');  }
-  if (tab === 'profile') { showScreen('profile-screen'); }
+  if (tab==='map')     showScreen('map-screen');
+  if (tab==='notify')  { renderNotifications(); showScreen('notify-screen'); }
+  if (tab==='profile') showScreen('profile-screen');
 }
 
-// ────────────────────────────
-// Start App
-// ────────────────────────────
+// ── Start App ────────────────────────────────────────────
 function startApp(role) {
   currentRole = role;
-
-  // Profile setup
-  if (role === 'traveler') {
-    document.getElementById('profile-avatar').textContent = '😊';
-    document.getElementById('profile-name').textContent = 'トラベラーさん';
-    document.getElementById('profile-role-badge').textContent = '✈️ トラベラー';
-    document.getElementById('profile-role-badge').className = 'profile-role traveler';
-    document.getElementById('fab-btn').textContent = '？';
-    document.getElementById('fab-btn').title = '募集を探す（現在地から更新）';
-  } else {
-    document.getElementById('profile-avatar').textContent = '🏠';
-    document.getElementById('profile-name').textContent = 'ローカルさん';
-    document.getElementById('profile-role-badge').textContent = '🏠 ローカル';
-    document.getElementById('profile-role-badge').className = 'profile-role local';
-    document.getElementById('fab-btn').textContent = '＋';
-    document.getElementById('fab-btn').classList.add('local-fab');
-  }
-
+  const t_ = T[currentLang];
+  const isTraveler = role==='traveler';
+  document.getElementById('profile-avatar').textContent  = isTraveler ? '😊' : '🏠';
+  document.getElementById('profile-name').textContent    = isTraveler ? t_.travelerNameLabel : t_.localNameLabel;
+  document.getElementById('profile-role-badge').textContent = isTraveler ? t_.travelerRoleBadge : t_.localRoleBadge;
+  document.getElementById('profile-role-badge').className = `profile-role ${role}`;
+  const fab = document.getElementById('fab-btn');
+  fab.textContent = isTraveler ? '？' : '＋';
+  fab.className = 'fab' + (isTraveler ? '' : ' local-fab');
   showScreen('map-screen');
   setTimeout(initMap, 100);
 }
-
 function onFabClick() {
-  if (currentRole === 'local') {
-    showScreen('create-screen');
-  } else {
-    // Refresh for traveler (demo: show toast)
-    showToast('📍 現在地周辺を更新しました');
-  }
+  if (currentRole==='local') { renderCreateForm(); showScreen('create-screen'); }
+  else showToast(t('toastRefreshed'));
 }
 
-// ────────────────────────────
-// Map
-// ────────────────────────────
+// ── Map ──────────────────────────────────────────────────
 function initMap() {
   if (leafletMap) { leafletMap.invalidateSize(); return; }
-
-  leafletMap = L.map('map', {
-    center: [24.1490, 120.6760],
-    zoom: 14,
-    zoomControl: false,
-    attributionControl: true,
-  });
-
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-    attribution: '&copy; OpenStreetMap &copy; CARTO',
-    maxZoom: 19,
-  }).addTo(leafletMap);
-
+  leafletMap = L.map('map',{center:[24.1490,120.6760],zoom:14,zoomControl:false});
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{attribution:'&copy; OpenStreetMap &copy; CARTO',maxZoom:19}).addTo(leafletMap);
   renderMarkers(players);
 }
 
 function renderMarkers(data) {
   markers.forEach(m => leafletMap.removeLayer(m));
   markers = [];
-
   data.forEach(p => {
     const cfg = sportConfig[p.sport];
-    const icon = L.divIcon({
-      className: '',
-      html: `<div class="sport-marker" style="background:${cfg.color}">${cfg.emoji}</div>`,
-      iconSize: [44, 44],
-      iconAnchor: [22, 22],
-    });
-    const m = L.marker([p.lat, p.lng], { icon })
-      .addTo(leafletMap)
-      .on('click', () => openCard(p));
+    const icon = L.divIcon({className:'',html:`<div class="sport-marker" style="background:${cfg.color}">${cfg.emoji}</div>`,iconSize:[44,44],iconAnchor:[22,22]});
+    const m = L.marker([p.lat,p.lng],{icon}).addTo(leafletMap).on('click',()=>openCard(p));
     markers.push(m);
   });
+  updateCountBadge(data.length);
+}
 
-  document.getElementById('count-badge').textContent =
-    `🎯 ${data.length}件のアクティビティ`;
+function updateCountBadge(n) {
+  const count = n !== undefined ? n : (activeFilter==='all' ? players.length : players.filter(p=>p.sport===activeFilter).length);
+  document.getElementById('count-badge').textContent = t('countBadge').replace('{n}', count);
 }
 
 function filterSport(el, sport) {
   document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
   el.classList.add('active');
   activeFilter = sport;
-  const filtered = sport === 'all' ? players : players.filter(p => p.sport === sport);
+  const filtered = sport==='all' ? players : players.filter(p=>p.sport===sport);
   renderMarkers(filtered);
 }
 
-// ────────────────────────────
-// Activity Card
-// ────────────────────────────
+// ── Activity Card ────────────────────────────────────────
 function openCard(player) {
   currentPlayer = player;
   const cfg = sportConfig[player.sport];
-  const stars = '★'.repeat(Math.round(player.rating)) + '☆'.repeat(5 - Math.round(player.rating));
+  const stars = '★'.repeat(Math.round(player.rating))+'☆'.repeat(5-Math.round(player.rating));
+  const lang = currentLang;
 
   document.getElementById('card-content').innerHTML = `
     <div class="card-hero">
       <div class="player-avatar">${player.avatar}</div>
       <div class="player-info">
-        <div class="player-name">${player.name}
-          ${player.verified ? '<span class="verified-badge">✓ 本人確認済</span>' : ''}
+        <div class="player-name">${player.name} ${player.verified?`<span class="verified-badge">✓ ${t('kycVerified')}</span>`:''}
         </div>
         <div class="player-meta">
-          <span>${player.age}歳</span>
-          <span>·</span>
+          <span>${player.age}</span><span>·</span>
           <span class="stars">${stars}</span>
           <span style="color:var(--gray-1);font-weight:700">${player.rating}</span>
-          <span style="color:var(--gray-3)">(${player.reviews}件)</span>
+          <span>(${player.reviews})</span>
         </div>
-        <div style="margin-top:6px">
-          <span class="sport-pill" style="background:${cfg.color}22;color:${cfg.color}">${cfg.emoji} ${cfg.label}</span>
-        </div>
+        <div style="margin-top:6px"><span class="sport-pill" style="background:${cfg.color}22;color:${cfg.color}">${cfg.emoji} ${t('filter'+player.sport.charAt(0).toUpperCase()+player.sport.slice(1))}</span></div>
       </div>
     </div>
     <div class="card-section">
-      <div class="card-label">日時・場所</div>
-      <div class="card-value">🕐 ${player.time}</div>
-      <div class="card-value" style="margin-top:4px">📍 ${player.venue}</div>
+      <div class="card-label">${t('cardLabelDatePlace')}</div>
+      <div class="card-value">🕐 ${tl(player.time)}</div>
+      <div class="card-value" style="margin-top:4px">📍 ${tl(player.venue)}</div>
     </div>
     <div class="card-section">
-      <div class="card-label">スキル・言語</div>
+      <div class="card-label">${t('cardLabelSkillLang')}</div>
       <div class="tags">
-        <span class="tag skill" style="background:${player.skillColor}22;color:${player.skillColor}">
-          ${player.skill}
-        </span>
-        ${player.languages.map(l => `<span class="tag lang">${l}</span>`).join('')}
+        <span class="tag skill" style="background:${player.skillColor}22;color:${player.skillColor}">${tl(player.skill)}</span>
+        ${player.languages.map(l=>`<span class="tag lang">${l}</span>`).join('')}
       </div>
     </div>
     <div class="card-section">
-      <div class="card-label">費用分担</div>
-      <div class="cost-box">
-        <div class="cost-icon">${player.costIcon}</div>
-        <div class="cost-text">${player.cost}</div>
-      </div>
+      <div class="card-label">${t('cardLabelCost')}</div>
+      <div class="cost-box"><div style="font-size:1.3rem">${player.costIcon}</div><div class="cost-text">${tl(player.cost)}</div></div>
     </div>
     <div class="card-section">
-      <div class="card-label">持ち物</div>
-      <div class="card-value">${player.gear}</div>
+      <div class="card-label">${t('cardLabelGear')}</div>
+      <div class="card-value">${tl(player.gear)}</div>
     </div>
     <div class="card-section">
-      <div class="card-label">一言</div>
-      <div class="bio-text">${player.bio}</div>
+      <div class="card-label">${t('cardLabelBio')}</div>
+      <div class="bio-text">${tl(player.bio)}</div>
     </div>
     <div style="height:8px"></div>
   `;
-
   document.getElementById('card-overlay').classList.add('show');
 }
+function closeCard() { document.getElementById('card-overlay').classList.remove('show'); }
 
-function closeCard() {
-  document.getElementById('card-overlay').classList.remove('show');
-}
-
-// ────────────────────────────
-// Request → Matching → Matched
-// ────────────────────────────
+// ── Request flow ─────────────────────────────────────────
 function openRequest() {
   const p = currentPlayer;
   const cfg = sportConfig[p.sport];
   document.getElementById('confirm-player-info').innerHTML = `
     <div class="confirm-avatar">${p.avatar}</div>
-    <div class="confirm-info">
+    <div>
       <div class="confirm-name">${p.name}</div>
-      <div class="confirm-detail">${cfg.emoji} ${cfg.label} · ${p.time}</div>
-      <div class="confirm-detail">📍 ${p.venue}</div>
-    </div>
-  `;
+      <div class="confirm-detail">${cfg.emoji} ${tl(p.time)}</div>
+      <div class="confirm-detail">📍 ${tl(p.venue)}</div>
+    </div>`;
   closeCard();
   document.getElementById('request-overlay').classList.add('show');
 }
-
-function closeRequest() {
-  document.getElementById('request-overlay').classList.remove('show');
-  openCard(currentPlayer);
-}
-
+function closeRequest() { document.getElementById('request-overlay').classList.remove('show'); openCard(currentPlayer); }
 function sendRequest() {
   document.getElementById('request-overlay').classList.remove('show');
   const cfg = sportConfig[currentPlayer.sport];
   document.getElementById('matching-icon').textContent = cfg.emoji;
   document.getElementById('matching-overlay').classList.add('show');
-
-  setTimeout(() => {
-    document.getElementById('matching-overlay').classList.remove('show');
-    showMatched();
-  }, 2800);
+  setTimeout(()=>{ document.getElementById('matching-overlay').classList.remove('show'); showMatched(); }, 2800);
 }
-
 function showMatched() {
   const p = currentPlayer;
   const cfg = sportConfig[p.sport];
   document.getElementById('matched-detail').innerHTML = `
     <div class="matched-player">
       <div class="matched-avatar">${p.avatar}</div>
-      <div>
-        <div class="matched-pname">${p.name}</div>
-        <div class="matched-pmeta">${cfg.emoji} ${cfg.label} · ★${p.rating}</div>
-      </div>
+      <div><div class="matched-pname">${p.name}</div><div class="matched-pmeta">${cfg.emoji} ★${p.rating}</div></div>
     </div>
     <div class="matched-info">
-      <div class="matched-row"><span class="mi">🕐</span><span class="ml">${p.time}</span></div>
-      <div class="matched-row"><span class="mi">📍</span><span class="ml">${p.venue}</span></div>
-      <div class="matched-row"><span class="mi">${p.costIcon}</span><span class="ml">${p.cost}</span></div>
-    </div>
-  `;
+      <div class="matched-row"><span class="mi">🕐</span><span class="ml">${tl(p.time)}</span></div>
+      <div class="matched-row"><span class="mi">📍</span><span class="ml">${tl(p.venue)}</span></div>
+      <div class="matched-row"><span class="mi">${p.costIcon}</span><span class="ml">${tl(p.cost)}</span></div>
+    </div>`;
   document.getElementById('matched-overlay').classList.add('show');
 }
+function closeMatched() { document.getElementById('matched-overlay').classList.remove('show'); closeCard(); }
 
-function closeMatched() {
-  document.getElementById('matched-overlay').classList.remove('show');
-  closeCard();
-}
-
-// ────────────────────────────
-// Review
-// ────────────────────────────
+// ── Review ───────────────────────────────────────────────
 function openReview() {
   const p = currentPlayer;
   document.getElementById('review-player-info').innerHTML = `
     <div class="review-avatar">${p.avatar}</div>
-    <div>
-      <div style="font-weight:800;font-size:.95rem">${p.name}</div>
-      <div style="font-size:.78rem;color:var(--gray-3)">${sportConfig[p.sport].emoji} ${p.time}</div>
-    </div>
-  `;
+    <div><div style="font-weight:800;font-size:.95rem">${p.name}</div>
+         <div style="font-size:.78rem;color:var(--gray-3)">${sportConfig[p.sport].emoji} ${tl(p.time)}</div></div>`;
+  const cats = T[currentLang].reviewCats || T.ja.reviewCats;
+  document.getElementById('review-cats').innerHTML = cats.map(cat=>`
+    <div class="review-cat">
+      <div class="review-cat-label">${cat}</div>
+      <div class="star-row">
+        ${[1,2,3,4,5].map(n=>`<span class="star" onclick="rateStar(this,${n})">★</span>`).join('')}
+      </div>
+    </div>`).join('');
   document.getElementById('matched-overlay').classList.remove('show');
   document.getElementById('review-overlay').classList.add('show');
 }
-
 function rateStar(el, n) {
-  const row = el.parentElement;
-  row.querySelectorAll('.star').forEach((s, i) => {
-    s.classList.toggle('filled', i < n);
-  });
+  el.parentElement.querySelectorAll('.star').forEach((s,i)=>s.classList.toggle('filled',i<n));
 }
-
 function submitReview() {
   document.getElementById('review-overlay').classList.remove('show');
-  showToast('⭐ レビューを送信しました！ありがとうございます');
-  closeCard();
+  showToast(t('toastReviewed')); closeCard();
 }
 
-// ────────────────────────────
-// Create Listing (Local)
-// ────────────────────────────
+// ── Notifications ────────────────────────────────────────
+function renderNotifications() {
+  const items = T[currentLang].notifItems || T.ja.notifItems;
+  document.getElementById('notif-list').innerHTML = items.map(n=>`
+    <div class="notif-item${n.unread?' unread':''}">
+      <div class="notif-avatar">${n.icon}</div>
+      <div class="notif-content">
+        <div class="notif-title">${n.title}</div>
+        <div class="notif-body">${n.body}</div>
+        <div class="notif-time">${n.time}</div>
+      </div>
+    </div>`).join('');
+}
+
+// ── Create form ──────────────────────────────────────────
+function renderCreateForm() {
+  const t_ = T[currentLang];
+  const sportOpts = {
+    ja:['🎾 テニス','🏸 バドミントン','🏀 バスケットボール','🏓 卓球','🥎 パデル'],
+    en:['🎾 Tennis','🏸 Badminton','🏀 Basketball','🏓 Table Tennis','🥎 Padel'],
+    'zh-TW':['🎾 網球','🏸 羽毛球','🏀 籃球','🏓 桌球','🥎 匹球'],
+  };
+  const skillOpts = {
+    ja:['🌱 初心者歓迎','🎯 中級者','🔥 上級者'],
+    en:['🌱 Beginners welcome','🎯 Intermediate','🔥 Advanced'],
+    'zh-TW':['🌱 歡迎初學者','🎯 中級','🔥 進階'],
+  };
+  const langOpts = {
+    ja:['中文 / English','中文 / 日本語','English only','中文 / English / 日本語'],
+    en:['中文 / English','English only','中文 / 日本語','中文 / English / 日本語'],
+    'zh-TW':['中文 / English','中文 / 日語','英語 only','中文 / English / 日語'],
+  };
+  const venues = {
+    ja:'台中公園テニスコート',en:'Taichung Park Tennis Court','zh-TW':'台中公園網球場',
+  };
+  const times = {
+    ja:'今日 15:00〜16:30',en:'Today 15:00–16:30','zh-TW':'今日 15:00〜16:30',
+  };
+  const so = sportOpts[currentLang]||sportOpts.ja;
+  const sk = skillOpts[currentLang]||skillOpts.ja;
+  const lo = langOpts[currentLang]||langOpts.ja;
+
+  document.getElementById('create-form-body').innerHTML = `
+    <div class="form-group"><label>${t_.createSportLabel||'スポーツ'}</label>
+      <select>${so.map(s=>`<option>${s}</option>`).join('')}</select></div>
+    <div class="form-group"><label>${t_.createVenueLabel||'場所'}</label>
+      <input type="text" value="${venues[currentLang]||venues.ja}"></div>
+    <div class="form-group"><label>${t_.createTimeLabel||'日時'}</label>
+      <input type="text" value="${times[currentLang]||times.ja}"></div>
+    <div class="form-group"><label>${t_.createSkillLabel||'スキル'}</label>
+      <select>${sk.map((s,i)=>`<option${i===1?' selected':''}>${s}</option>`).join('')}</select></div>
+    <div class="form-group"><label>${t_.createLangLabel||'言語'}</label>
+      <select>${lo.map(s=>`<option>${s}</option>`).join('')}</select></div>
+    <div class="form-group"><label>${t_.createCostLabel||'費用'}</label>
+      <div class="cost-options">
+        <label class="cost-option"><input type="radio" name="cost" checked><span>${t_.createCostSplit}</span></label>
+        <label class="cost-option"><input type="radio" name="cost"><span>${t_.createCostGuestPays}</span></label>
+        <label class="cost-option"><input type="radio" name="cost"><span>${t_.createCostHostPays}</span></label>
+      </div>
+    </div>`;
+}
+
+// ── Publish ──────────────────────────────────────────────
 function publishListing() {
   showScreen('map-screen');
-  setTimeout(() => {
-    showToast('📍 募集を地図に公開しました！');
-    // Add a demo new marker
-    const icon = L.divIcon({
-      className: '',
-      html: `<div class="sport-marker" style="background:#0E9F6E;border:3px solid #fff">🎾</div>`,
-      iconSize: [44, 44], iconAnchor: [22, 22],
-    });
-    const m = L.marker([24.1600, 120.6780], { icon }).addTo(leafletMap);
-    markers.push(m);
-  }, 300);
+  setTimeout(()=>{
+    showToast(t('toastPublished'));
+    const icon = L.divIcon({className:'',html:`<div class="sport-marker" style="background:#0E9F6E">🎾</div>`,iconSize:[44,44],iconAnchor:[22,22]});
+    markers.push(L.marker([24.1600,120.6780],{icon}).addTo(leafletMap));
+  },300);
 }
 
-// ────────────────────────────
-// Toast
-// ────────────────────────────
+// ── Toast ────────────────────────────────────────────────
 let toastTimer;
 function showToast(msg) {
-  let t = document.getElementById('app-toast');
-  if (!t) {
-    t = document.createElement('div');
-    t.id = 'app-toast';
-    t.style.cssText = `
-      position:absolute;bottom:80px;left:50%;transform:translateX(-50%);
-      background:var(--gray-1);color:white;padding:11px 22px;border-radius:100px;
-      font-size:.82rem;font-weight:700;z-index:999;white-space:nowrap;
-      opacity:0;transition:opacity .25s;pointer-events:none;box-shadow:0 4px 16px rgba(0,0,0,.3);
-    `;
-    document.getElementById('app').appendChild(t);
+  let el = document.getElementById('app-toast');
+  if (!el) {
+    el = document.createElement('div');
+    el.id='app-toast';
+    el.style.cssText='position:absolute;bottom:80px;left:50%;transform:translateX(-50%);background:var(--gray-1);color:white;padding:11px 22px;border-radius:100px;font-size:.82rem;font-weight:700;z-index:999;white-space:nowrap;opacity:0;transition:opacity .25s;pointer-events:none;box-shadow:0 4px 16px rgba(0,0,0,.3);';
+    document.getElementById('app').appendChild(el);
   }
-  t.textContent = msg;
-  t.style.opacity = '1';
+  el.textContent=msg; el.style.opacity='1';
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => { t.style.opacity = '0'; }, 3000);
+  toastTimer=setTimeout(()=>el.style.opacity='0',3000);
 }
 
-// Handle back on overlays with escape-like tap on backdrop
-document.getElementById('card-overlay').querySelector('.card-backdrop').addEventListener('click', closeCard);
+// Init
+setLang(currentLang);
+document.getElementById('card-overlay').querySelector('.card-backdrop').addEventListener('click',closeCard);
 </script>
 </body>
 </html>
