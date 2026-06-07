@@ -3,7 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TrustMatch — 信頼できる日本人と出会う</title>
+  <title>Trustr — 信頼できる日本人と出会う</title>
+  <meta property="og:title" content="Trustr — 信頼スコアで繋ぐ、台湾×日本マッチング">
+  <meta property="og:description" content="旅行・スポーツ相手探しから共同創業者探しまで。独自の「2種類の信頼スコア」で、あなたの目的に最適な日本人をご紹介します。">
+  <meta property="og:image" content="ogp.png">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Trustr — 信頼スコアで繋ぐ、台湾×日本マッチング">
+  <meta name="twitter:description" content="旅行・スポーツ相手探しから共同創業者探しまで。独自の「2種類の信頼スコア」で、あなたの目的に最適な日本人をご紹介します。">
+  <meta name="twitter:image" content="ogp.png">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -91,14 +99,14 @@
     .step-panel { display:none; }
     .step-panel.active { display:block; }
 
-    .purpose-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(175px,1fr)); gap:16px; }
-    .purpose-card { border:2px solid var(--gray-4); border-radius:var(--radius); padding:24px 18px; cursor:pointer; transition:all .2s; text-align:center; background:var(--white); }
+    .purpose-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(165px,1fr)); gap:14px; }
+    .purpose-card { border:2px solid var(--gray-4); border-radius:var(--radius); padding:20px 16px; cursor:pointer; transition:all .2s; text-align:center; background:var(--white); }
     .purpose-card:hover { border-color:var(--navy); transform:translateY(-2px); box-shadow:var(--shadow); }
     .purpose-card.sel { border-color:var(--navy); background:var(--navy-l); }
-    .p-ico { font-size:1.9rem; margin-bottom:10px; }
-    .p-title { font-size:.88rem; font-weight:800; margin-bottom:5px; }
-    .p-sub { font-size:.73rem; color:var(--gray-3); margin-bottom:10px; }
-    .p-trust { display:inline-block; font-size:.68rem; font-weight:700; padding:2px 8px; border-radius:100px; }
+    .p-ico { font-size:1.7rem; margin-bottom:8px; }
+    .p-title { font-size:.85rem; font-weight:800; margin-bottom:4px; }
+    .p-sub { font-size:.7rem; color:var(--gray-3); margin-bottom:8px; }
+    .p-trust { display:inline-block; font-size:.65rem; font-weight:700; padding:2px 8px; border-radius:100px; }
     .tl { background:var(--blue-l); color:var(--blue); }
     .tm { background:var(--gold-l); color:#92630A; }
     .th { background:#FEE2E2; color:#991B1B; }
@@ -115,7 +123,9 @@
     .score-slider::-webkit-slider-thumb { -webkit-appearance:none; width:22px; height:22px; border-radius:50%; background:var(--navy); cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,.18); }
     .score-val { font-size:1.4rem; font-weight:900; color:var(--navy); min-width:48px; text-align:right; }
     .slider-labels { display:flex; justify-content:space-between; font-size:.7rem; color:var(--gray-3); margin-top:4px; }
-    .tags-row { display:flex; flex-wrap:wrap; gap:8px; }
+    .crit-cat-label { font-size:.72rem; font-weight:700; color:var(--gray-3); margin-bottom:6px; margin-top:10px; letter-spacing:.05em; }
+    .crit-cat-label:first-child { margin-top:0; }
+    .tags-row { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:4px; }
     .tag { padding:6px 14px; border-radius:100px; font-size:.79rem; font-weight:700; cursor:pointer; transition:all .2s; border:1.5px solid var(--gray-4); background:var(--white); color:var(--gray-2); }
     .tag:hover { border-color:var(--green); color:var(--green); }
     .tag.sel { background:var(--green-l); border-color:var(--green); color:#065F46; }
@@ -213,7 +223,7 @@
 <body>
 
 <nav>
-  <div class="logo">Trust<span>Match</span></div>
+  <div class="logo">Trust<span>r</span></div>
   <div class="lang-toggle">
     <button class="lang-btn active" id="lb-ja" onclick="setLang('ja')">日</button>
     <button class="lang-btn" id="lb-zh" onclick="setLang('zh-TW')">繁</button>
@@ -302,7 +312,19 @@
           <div class="p-ico">🤝</div>
           <div class="p-title" id="p2t">交流・ネットワーク</div>
           <div class="p-sub" id="p2s">語学練習、地域のつながり、人脈づくり</div>
-          <span class="p-trust tm" id="p2r">信頼度：ミディアム</span>
+          <span class="p-trust tl" id="p2r">信頼度：ライト</span>
+        </div>
+        <div class="purpose-card" id="pc-practice" onclick="selectP('practice')">
+          <div class="p-ico">💬</div>
+          <div class="p-title" id="p5t">日本語会話練習</div>
+          <div class="p-sub" id="p5s">ビジネス場面を想定した会話練習相手を探す</div>
+          <span class="p-trust tl" id="p5r">信頼度：ライト</span>
+        </div>
+        <div class="purpose-card" id="pc-realestate" onclick="selectP('realestate')">
+          <div class="p-ico">🏠</div>
+          <div class="p-title" id="p6t">不動産・オフィス探し</div>
+          <div class="p-sub" id="p6s">内見に同行してくれる信頼できる人を探す</div>
+          <span class="p-trust tm" id="p6r">信頼度：ミディアム</span>
         </div>
         <div class="purpose-card" id="pc-biz" onclick="selectP('biz')">
           <div class="p-ico">💼</div>
@@ -315,6 +337,24 @@
           <div class="p-title" id="p4t">共同創業者</div>
           <div class="p-sub" id="p4s">一緒に会社を作る仲間を探す</div>
           <span class="p-trust th" id="p4r">信頼度：最高</span>
+        </div>
+        <div class="purpose-card" id="pc-cooking" onclick="selectP('cooking')">
+          <div class="p-ico">🍳</div>
+          <div class="p-title" id="p7t">一緒に料理する人</div>
+          <div class="p-sub" id="p7s">料理を一緒に楽しめる相手を探す</div>
+          <span class="p-trust tl" id="p7r">信頼度：ライト</span>
+        </div>
+        <div class="purpose-card" id="pc-outdoor" onclick="selectP('outdoor')">
+          <div class="p-ico">🏔️</div>
+          <div class="p-title" id="p8t">ハイキング・旅行</div>
+          <div class="p-sub" id="p8s">一緒にハイキング・サイクリング・旅行できる人</div>
+          <span class="p-trust tl" id="p8r">信頼度：ライト</span>
+        </div>
+        <div class="purpose-card" id="pc-cats" onclick="selectP('cats')">
+          <div class="p-ico">🐱</div>
+          <div class="p-title" id="p9t">猫の話をする人</div>
+          <div class="p-sub" id="p9s">猫が好きな日本人と気軽に交流する</div>
+          <span class="p-trust tl" id="p9r">信頼度：ライト</span>
         </div>
       </div>
       <div class="btn-row"><button class="btn-p" onclick="goStep(2)" id="s1next">次へ →</button></div>
@@ -335,7 +375,7 @@
         <div class="crit-section">
           <div class="crit-label">🎯 <span id="cl2">あなただけの条件（絶対評価）</span><span class="crit-badge cb-green" id="cb2">個人設定</span></div>
           <p class="crit-desc" id="cd2">あなたが特に重視したい条件を選んでください（複数可）。</p>
-          <div class="tags-row" id="tags-container"></div>
+          <div id="tags-container"></div>
         </div>
         <div class="crit-section">
           <div class="crit-label">🗣️ <span id="cl3">希望言語</span></div>
@@ -392,7 +432,7 @@
 </section>
 
 <footer>
-  <p id="ft-copy">© 2025 TrustMatch — ベータ版</p>
+  <p id="ft-copy">© 2025 Trustr — ベータ版</p>
   <p style="margin-top:6px;" id="ft-contact">お問い合わせ: <a href="mailto:hello@trustmatch.example">hello@trustmatch.example</a></p>
 </footer>
 
@@ -424,7 +464,7 @@ const profiles = [
     },
     tags:{ja:['元トヨタ','テニス15年','起業支援','英語OK'], zh:['前豐田','網球15年','新創經驗','英語OK']},
     hi:['元トヨタ','テニス15年','前豐田','網球15年'],
-    ps:{sports:95, network:80, biz:88, cofounder:76},
+    ps:{sports:95, network:80, biz:88, cofounder:76, practice:72, realestate:55, cooking:62, outdoor:75, cats:42},
   },
   { id:2, av:'👩‍💻', bg:'#ECFDF5', commonScore:93,
     name:{ja:'鈴木 花子', zh:'鈴木 花子'},
@@ -435,7 +475,7 @@ const profiles = [
     },
     tags:{ja:['元Google','CTO経験','中国語HSK5','M&A経験'], zh:['前Google','CTO經驗','中文HSK5','M&A經驗']},
     hi:['元Google','CTO経験','中国語HSK5','前Google','CTO經驗','中文HSK5'],
-    ps:{sports:42, network:85, biz:95, cofounder:98},
+    ps:{sports:42, network:85, biz:95, cofounder:98, practice:60, realestate:38, cooking:55, outdoor:58, cats:70},
   },
   { id:3, av:'👨‍🏫', bg:'#FEF9EC', commonScore:96,
     name:{ja:'山田 大輔', zh:'山田 大輔'},
@@ -446,7 +486,7 @@ const profiles = [
     },
     tags:{ja:['甲子園','上場2回','エンジェル投資家','台湾経験'], zh:['甲子園','上市2次','天使投資人','台灣經驗']},
     hi:['甲子園','上場2回','エンジェル投資家','上市2次','天使投資人'],
-    ps:{sports:68, network:85, biz:92, cofounder:90},
+    ps:{sports:68, network:85, biz:92, cofounder:90, practice:50, realestate:80, cooking:45, outdoor:72, cats:38},
   },
   { id:4, av:'👩‍🎾', bg:'#EFF6FF', commonScore:74,
     name:{ja:'佐藤 美咲', zh:'佐藤 美咲'},
@@ -457,7 +497,29 @@ const profiles = [
     },
     tags:{ja:['台中在住','テニスコーチ','中国語OK','日台交流'], zh:['住台中','網球教練','中文OK','日台交流']},
     hi:['台中在住','テニスコーチ','中国語OK','住台中','網球教練','中文OK'],
-    ps:{sports:98, network:80, biz:48, cofounder:38},
+    ps:{sports:98, network:80, biz:48, cofounder:38, practice:88, realestate:95, cooking:75, outdoor:95, cats:65},
+  },
+  { id:5, av:'🏘️', bg:'#F0FDF4', commonScore:82,
+    name:{ja:'松本 健太', zh:'松本 健太'},
+    meta:{ja:'38歳・台中/台北・不動産エージェント', zh:'38歲・台中/台北・房產顧問'},
+    details:{
+      ja:['🏠 台湾在住8年・台中・台北エリア専門','🔑 宅地建物取引士・日本台湾両市場に精通','🗣️ 日本語・中国語（流暢）・英語（日常会話）','👁️ 物件内見同行・交渉代行・契約サポート','📋 外国人オーナー向け賃貸・売買の手続きに慣れている'],
+      zh:['🏠 在台8年，專攻台中・台北地區','🔑 日本不動產執照，熟悉日台兩地市場','🗣️ 日語・流利中文・英語（日常會話）','👁️ 陪同看房・代為交涉・契約支援','📋 熟悉外籍人士租屋購屋手續'],
+    },
+    tags:{ja:['台中在住','不動産専門','中国語OK','内見同行可'], zh:['住台中','房產專家','中文OK','可陪同看房']},
+    hi:['台中在住','不動産専門','内見同行可','住台中','房產專家','可陪同看房'],
+    ps:{sports:45, network:72, biz:75, cofounder:52, practice:58, realestate:99, cooking:68, outdoor:82, cats:58},
+  },
+  { id:6, av:'👩‍🏫', bg:'#FFF7ED', commonScore:87,
+    name:{ja:'中村 麻衣', zh:'中村 麻衣'},
+    meta:{ja:'31歳・大阪/オンライン・日本語ビジネスコーチ', zh:'31歲・大阪/線上・商務日語教練'},
+    details:{
+      ja:['📚 日本語指導歴7年・ビジネス日本語専門','🎓 日本語教育能力検定試験合格・JLPT指導実績','🗣️ 日本語・中国語（HSK4級）・英語','💼 商談・プレゼン・メール対応のロールプレイ対応','🖥️ オンライン/対面どちらも対応可・週2〜3回OK'],
+      zh:['📚 教學資歷7年，專攻商務日語','🎓 日語教育能力考試合格，有JLPT輔導實績','🗣️ 日語・中文（HSK4級）・英語','💼 可進行商務洽談・簡報・Email的角色扮演練習','🖥️ 線上/面授均可，每週2〜3次OK'],
+    },
+    tags:{ja:['ビジネス日本語','JLPT指導','ロールプレイ可','オンラインOK'], zh:['商務日語','JLPT輔導','可角色扮演','線上OK']},
+    hi:['ビジネス日本語','JLPT指導','ロールプレイ可','商務日語','JLPT輔導','可角色扮演'],
+    ps:{sports:28, network:68, biz:58, cofounder:38, practice:99, realestate:30, cooking:85, outdoor:62, cats:90},
   },
 ];
 
@@ -480,9 +542,14 @@ const T = {
     dmLbl:'INTERACTIVE DEMO', dmTtl:'実際にマッチングを試してみる', dmSub:'目的と条件を選ぶだけで、あなたに合った日本人が見つかります。',
     sl1:'目的を選ぶ', sl2:'条件を設定', sl3:'マッチング結果',
     p1t:'スポーツ・趣味', p1s:'テニス、ゴルフ等、一緒に楽しめる相手を探す', p1r:'信頼度：ライト',
-    p2t:'交流・ネットワーク', p2s:'語学練習、地域のつながり、人脈づくり', p2r:'信頼度：ミディアム',
+    p2t:'交流・ネットワーク', p2s:'語学練習、地域のつながり、人脈づくり', p2r:'信頼度：ライト',
     p3t:'ビジネス協力', p3s:'取引先、顧問、アドバイザーを探す', p3r:'信頼度：ハイ',
     p4t:'共同創業者', p4s:'一緒に会社を作る仲間を探す', p4r:'信頼度：最高',
+    p5t:'日本語会話練習', p5s:'ビジネス場面を想定した会話練習相手を探す', p5r:'信頼度：ライト',
+    p6t:'不動産・オフィス探し', p6s:'内見に同行してくれる信頼できる人を探す', p6r:'信頼度：ミディアム',
+    p7t:'一緒に料理する人', p7s:'料理を一緒に楽しめる相手を探す', p7r:'信頼度：ライト',
+    p8t:'ハイキング・旅行', p8s:'一緒にハイキング・サイクリング・旅行できる人', p8r:'信頼度：ライト',
+    p9t:'猫の話をする人', p9s:'猫が好きな日本人と気軽に交流する', p9r:'信頼度：ライト',
     s1next:'次へ →',
     cl1:'共通スコアの最低基準', cb1:'相対評価', cd1:'社会的な信頼の最低ラインを設定します。高いほど信頼性が高い人に絞り込まれます。',
     slLo:'低め（ライト用途）', slHi:'高め（ビジネス用途）',
@@ -497,15 +564,67 @@ const T = {
     uc3t:'共同創業・事業提携', uc3b:'価値観・パッションが合い、高い信頼性を持つ日本人の共同創業者を探す。', uc3r:'共通スコア 80以上 + 絶対評価必須',
     ctaLbl:'BETA REGISTRATION', ctaTtl:'先行テスターとして登録する', ctaSub:'ベータ版のリリース時に最優先でご案内します。完全無料。',
     ctaEmail:'メールアドレスを入力', ctaBtn:'先行登録する（無料）', ctaMicro:'スパムは送りません。リリース時のみご連絡します。',
-    ftCopy:'© 2025 TrustMatch — ベータ版', ftContact:'お問い合わせ:',
+    ftCopy:'© 2025 Trustr — ベータ版', ftContact:'お問い合わせ:',
     detLbl:'プロフィール詳細', psLbl:'適合度',
     toastOK:'✅ 登録完了！リリース時にご連絡します。', toastNoMail:'⚠️ メールアドレスを正しく入力してください',
     toastSent:'✅ リクエストを送りました！確認後ご連絡します。', toastNoP:'⚠️ まず目的を選んでください',
     criteriaMap:{
-      sports:['テニス経験','中国語OK','週末参加可能','道具貸出可','ゴルフ経験','台湾在住歴あり'],
-      network:['中国語OK','英語OK','台湾経験あり','外国人交流好き','ビジネス人脈'],
-      biz:['起業経験','元大企業勤務','台湾ビジネス経験','業界専門家','投資家ネットワーク'],
-      cofounder:['起業経験あり','甲子園経験','元〇〇社員','エンジェル投資家','M&A経験','CTO経験','パッション重視'],
+      sports:[
+        { cat:'🏃 スポーツ・アクティビティ', tags:['テニス経験','ゴルフ経験','マラソン経験','筋トレ習慣','登山・アウトドア','スポーツ指導経験','甲子園経験'] },
+        { cat:'🌏 ライフスタイル', tags:['週末参加可','台湾在住歴あり','非喫煙者','早起き派'] },
+        { cat:'🗣️ 言語', tags:['中国語OK','英語OK','台湾文化に詳しい'] },
+        { cat:'👤 プロフィール・背景', tags:['子供あり','子供なし','既婚','未婚','大学卒以上','大学院卒','料理好き','アウトドア好き','猫好き','旅行好き'] },
+      ],
+      network:[
+        { cat:'🌐 コミュニケーション', tags:['中国語OK','英語OK','台湾文化に詳しい','外国人交流好き'] },
+        { cat:'👥 人脈・経験', tags:['台湾ビジネス経験','コーチング経験','メンター経験','日台交流実績','ビジネス人脈'] },
+        { cat:'⭐ 信頼性', tags:['KYC認証済','レビュー評価4.5↑','レスポンス率90%↑'] },
+        { cat:'👤 プロフィール・背景', tags:['子供あり','子供なし','既婚','未婚','大学卒以上','大学院卒','料理好き','アウトドア好き','猫好き','旅行好き'] },
+      ],
+      practice:[
+        { cat:'📚 指導スキル', tags:['ビジネス日本語指導経験','外国人への日本語指導経験','JLPT指導実績','ロールプレイ実施可','メール・文書指導可'] },
+        { cat:'📅 スケジュール・スタイル', tags:['週2〜3回可能','オンラインOK','対面OK','中国語でサポート可','丁寧・忍耐強い'] },
+        { cat:'⭐ 信頼性', tags:['指導実績あり','継続サポート可','KYC認証済'] },
+        { cat:'👤 プロフィール・背景', tags:['子供あり','子供なし','既婚','未婚','大学卒以上','大学院卒'] },
+      ],
+      realestate:[
+        { cat:'🏠 不動産スキル', tags:['不動産業界経験','内見同行可','宅地建物取引士','行政手続きサポート可','オーナー交渉代行可'] },
+        { cat:'📍 エリア', tags:['東京エリア','大阪・関西','名古屋・東海','台中在住','台北在住'] },
+        { cat:'🌏 台湾対応', tags:['中国語OK','台湾人向け対応経験','外国人向け物件対応','英語OK'] },
+        { cat:'👤 プロフィール・背景', tags:['子供あり','子供なし','既婚','未婚','大学卒以上'] },
+      ],
+      biz:[
+        { cat:'💼 キャリア・実績', tags:['起業経験','元大企業勤務','台湾ビジネス経験','上場経験','資金調達経験','M&A経験'] },
+        { cat:'🏢 業界人脈（指定可）', tags:['製造業人脈','IT業界人脈','金融・投資人脈','小売・EC人脈','医療・ヘルスケア人脈','不動産業界人脈'] },
+        { cat:'📜 資格・スキル', tags:['弁護士','公認会計士・税理士','中小企業診断士','特許・知財の知識','デザイン経験','エンジニアリング経験'] },
+        { cat:'⭐ 信頼性', tags:['KYC認証済','レビュー評価4.5↑','マッチング実績5件↑'] },
+        { cat:'👤 プロフィール・背景', tags:['子供あり','子供なし','既婚','未婚','大学卒以上','大学院卒'] },
+      ],
+      cofounder:[
+        { cat:'🚀 起業・実績', tags:['起業経験あり','上場経験','M&A経験','資金調達経験','エンジェル投資家','甲子園経験'] },
+        { cat:'💡 スキル・役割', tags:['CTO経験','営業・BizDev経験','HR・採用経験','プロダクト開発経験','海外展開経験'] },
+        { cat:'🌏 台湾接点', tags:['台湾ビジネス経験','中国語OK','台湾在住歴あり','台湾人パートナー経験'] },
+        { cat:'⭐ 信頼性', tags:['KYC認証済','レビュー評価4.5↑','マッチング実績5件↑','レスポンス率90%↑'] },
+        { cat:'👤 プロフィール・背景', tags:['子供あり','子供なし','既婚','未婚','大学卒以上','大学院卒'] },
+      ],
+      cooking:[
+        { cat:'🍳 料理スタイル', tags:['和食好き','洋食好き','アジア料理好き','お菓子・スイーツ作り','宅飲み・ホームパーティ','食材にこだわる','台湾料理に詳しい'] },
+        { cat:'🌏 ライフスタイル', tags:['週末参加可','非喫煙者','一人暮らし','台湾在住歴あり'] },
+        { cat:'🗣️ 言語', tags:['中国語OK','英語OK','台湾文化に詳しい'] },
+        { cat:'👤 プロフィール・背景', tags:['子供あり','子供なし','既婚','未婚','大学卒以上','料理好き','アウトドア好き','旅行好き'] },
+      ],
+      outdoor:[
+        { cat:'🏔️ アクティビティ', tags:['ハイキング経験あり','サイクリング経験あり','登山好き','キャンプ好き','旅行好き','バックパッカー経験','国内旅行好き','海外旅行好き'] },
+        { cat:'📅 スケジュール', tags:['週末参加可','長期休暇に動ける','急な誘いOK','台湾在住歴あり'] },
+        { cat:'🗣️ 言語', tags:['中国語OK','英語OK','台湾文化に詳しい'] },
+        { cat:'👤 プロフィール・背景', tags:['子供あり','子供なし','既婚','未婚','大学卒以上','アウトドア好き','料理好き','旅行好き'] },
+      ],
+      cats:[
+        { cat:'🐱 猫との関わり', tags:['猫を飼っている','元猫オーナー','猫カフェ常連','保護猫活動に関心あり','多頭飼い経験','猫好き全般'] },
+        { cat:'🌏 ライフスタイル', tags:['週末参加可','非喫煙者','ペット好き全般','台湾在住歴あり'] },
+        { cat:'🗣️ 言語', tags:['中国語OK','英語OK','台湾文化に詳しい'] },
+        { cat:'👤 プロフィール・背景', tags:['子供あり','子供なし','既婚','未婚','大学卒以上','猫好き','料理好き','旅行好き'] },
+      ],
     },
   },
   'zh-TW':{
@@ -525,9 +644,14 @@ const T = {
     dmLbl:'互動示範', dmTtl:'親自體驗配對流程', dmSub:'只需選擇目的和條件，就能找到適合您的日本人。',
     sl1:'選擇目的', sl2:'設定條件', sl3:'配對結果',
     p1t:'運動・興趣', p1s:'尋找可以一起打網球、高爾夫的夥伴', p1r:'信任需求：輕度',
-    p2t:'交流・拓展人脈', p2s:'語言練習、在地連結、人際拓展', p2r:'信任需求：中度',
+    p2t:'交流・拓展人脈', p2s:'語言練習、在地連結、人際拓展', p2r:'信任需求：輕度',
     p3t:'商業合作', p3s:'尋找交易夥伴、顧問、商業協作者', p3r:'信任需求：高度',
     p4t:'共同創業者', p4s:'尋找一起創立公司的夥伴', p4r:'信任需求：最高',
+    p5t:'日語商務會話練習', p5s:'尋找可進行商業場景練習的日語對話夥伴', p5r:'信任需求：輕度',
+    p6t:'房屋・辦公室尋找', p6s:'尋找可陪同看房的值得信任的人', p6r:'信任需求：中度',
+    p7t:'一起烹飪的人', p7s:'尋找可以一起享受烹飪的夥伴', p7r:'信任需求：輕度',
+    p8t:'健行・旅行夥伴', p8s:'尋找可一起健行・騎車・旅行的夥伴', p8r:'信任需求：輕度',
+    p9t:'聊貓咪的人', p9s:'尋找喜愛貓咪的日本人輕鬆交流', p9r:'信任需求：輕度',
     s1next:'下一步 →',
     cl1:'通用分數最低基準', cb1:'相對評分', cd1:'設定社會信任的最低門檻。分數越高，篩選出的對象越可信。',
     slLo:'較低（輕度用途）', slHi:'較高（商業用途）',
@@ -542,15 +666,67 @@ const T = {
     uc3t:'共同創業・事業合作', uc3b:'想在日本找到一起創業的夥伴。尋找價值觀・熱情契合且高度可信的日本人。', uc3r:'通用分數 80以上 + 絕對評分必要',
     ctaLbl:'BETA REGISTRATION', ctaTtl:'申請成為先行測試者', ctaSub:'Beta版上線時將優先通知您，完全免費。',
     ctaEmail:'輸入電子郵件地址', ctaBtn:'免費先行報名', ctaMicro:'不會發送垃圾郵件，僅在上線時通知您。',
-    ftCopy:'© 2025 TrustMatch — Beta版', ftContact:'洽詢:',
+    ftCopy:'© 2025 Trustr — Beta版', ftContact:'洽詢:',
     detLbl:'個人檔案詳情', psLbl:'適合度',
     toastOK:'✅ 報名成功！上線時將通知您。', toastNoMail:'⚠️ 請輸入有效的電子郵件地址',
     toastSent:'✅ 已送出請求！確認後將與您聯絡。', toastNoP:'⚠️ 請先選擇目的',
     criteriaMap:{
-      sports:['網球經驗','中文OK','週末可參加','可借用器材','高爾夫經驗','有台灣生活經驗'],
-      network:['中文OK','英語OK','有台灣經驗','喜歡與外國人交流','商業人脈'],
-      biz:['創業經驗','曾任職大企業','台灣商業經驗','業界專家','投資人脈'],
-      cofounder:['有創業經驗','甲子園經驗','前○○公司','天使投資人','M&A經驗','CTO經驗','重視熱情'],
+      sports:[
+        { cat:'🏃 運動・活動', tags:['網球經驗','高爾夫經驗','馬拉松經驗','健身習慣','登山・戶外','運動指導經驗','甲子園經驗'] },
+        { cat:'🌏 生活方式', tags:['週末可參加','有台灣居住經驗','非吸菸者','早起習慣'] },
+        { cat:'🗣️ 語言', tags:['中文OK','英語OK','熟悉台灣文化'] },
+        { cat:'👤 個人背景・生活', tags:['有子女','無子女','已婚','未婚','大學以上學歷','研究所學歷','喜愛烹飪','喜愛戶外活動','喜愛貓咪','喜愛旅行'] },
+      ],
+      network:[
+        { cat:'🌐 溝通能力', tags:['中文OK','英語OK','熟悉台灣文化','喜歡與外國人交流'] },
+        { cat:'👥 人脈・經驗', tags:['台灣商業經驗','教練經驗','導師經驗','日台交流實績','商業人脈'] },
+        { cat:'⭐ 可信度', tags:['KYC認證','評分4.5↑','回覆率90%↑'] },
+        { cat:'👤 個人背景・生活', tags:['有子女','無子女','已婚','未婚','大學以上學歷','研究所學歷','喜愛烹飪','喜愛戶外活動','喜愛貓咪','喜愛旅行'] },
+      ],
+      practice:[
+        { cat:'📚 教學能力', tags:['商務日語指導經驗','外籍人士日語指導經驗','JLPT輔導實績','可角色扮演練習','可指導郵件・文書'] },
+        { cat:'📅 排程・方式', tags:['每週2〜3次可', '線上OK','面授OK','可用中文輔助說明','耐心細心'] },
+        { cat:'⭐ 可信度', tags:['有指導實績','可長期支援','KYC認證'] },
+        { cat:'👤 個人背景・生活', tags:['有子女','無子女','已婚','未婚','大學以上學歷','研究所學歷'] },
+      ],
+      realestate:[
+        { cat:'🏠 房產能力', tags:['房產業界經驗','可陪同看房','日本宅建士執照','可協助行政手續','可代為交涉'] },
+        { cat:'📍 地區', tags:['東京地區','大阪・關西','名古屋・東海','定居台中','定居台北'] },
+        { cat:'🌏 台灣對應', tags:['中文OK','有服務台灣人的經驗','熟悉外籍人士租屋','英語OK'] },
+        { cat:'👤 個人背景・生活', tags:['有子女','無子女','已婚','未婚','大學以上學歷'] },
+      ],
+      biz:[
+        { cat:'💼 職涯・實績', tags:['創業經驗','曾任職大企業','台灣商業經驗','上市經驗','融資經驗','M&A經驗'] },
+        { cat:'🏢 業界人脈（可指定）', tags:['製造業人脈','IT業界人脈','金融・投資人脈','零售・電商人脈','醫療・健康產業人脈','不動產業界人脈'] },
+        { cat:'📜 資格・技能', tags:['律師','會計師・稅務士','中小企業診斷師','專利・智財知識','設計經驗','工程師背景'] },
+        { cat:'⭐ 可信度', tags:['KYC認證','評分4.5↑','配對實績5件↑'] },
+        { cat:'👤 個人背景・生活', tags:['有子女','無子女','已婚','未婚','大學以上學歷','研究所學歷'] },
+      ],
+      cofounder:[
+        { cat:'🚀 創業・實績', tags:['有創業經驗','上市經驗','M&A經驗','融資經驗','天使投資人','甲子園經驗'] },
+        { cat:'💡 技能・角色', tags:['CTO經驗','業務・BizDev經驗','HR・招募經驗','產品開發經驗','海外拓展經驗'] },
+        { cat:'🌏 台灣連結', tags:['台灣商業經驗','中文OK','有台灣居住經驗','有台灣合作夥伴經驗'] },
+        { cat:'⭐ 可信度', tags:['KYC認證','評分4.5↑','配對實績5件↑','回覆率90%↑'] },
+        { cat:'👤 個人背景・生活', tags:['有子女','無子女','已婚','未婚','大學以上學歷','研究所學歷'] },
+      ],
+      cooking:[
+        { cat:'🍳 料理風格', tags:['喜愛日式料理','喜愛西式料理','喜愛亞洲料理','烘焙・甜點','居家派對・宅飲','重視食材品質','熟悉台灣料理'] },
+        { cat:'🌏 生活方式', tags:['週末可參加','非吸菸者','單身生活','有台灣居住經驗'] },
+        { cat:'🗣️ 語言', tags:['中文OK','英語OK','熟悉台灣文化'] },
+        { cat:'👤 個人背景・生活', tags:['有子女','無子女','已婚','未婚','大學以上學歷','喜愛烹飪','喜愛戶外活動','喜愛旅行'] },
+      ],
+      outdoor:[
+        { cat:'🏔️ 活動類型', tags:['有健行經驗','有單車騎乘經驗','喜愛登山','喜愛露營','喜愛旅行','背包客經驗','國內旅行','海外旅行'] },
+        { cat:'📅 時間安排', tags:['週末可參加','長假可配合','隨時可約','有台灣居住經驗'] },
+        { cat:'🗣️ 語言', tags:['中文OK','英語OK','熟悉台灣文化'] },
+        { cat:'👤 個人背景・生活', tags:['有子女','無子女','已婚','未婚','大學以上學歷','喜愛戶外活動','喜愛烹飪','喜愛旅行'] },
+      ],
+      cats:[
+        { cat:'🐱 與貓咪的關係', tags:['目前養貓','曾養過貓','常去貓咪咖啡廳','關心流浪貓保護','多貓同住經驗','泛愛貓者'] },
+        { cat:'🌏 生活方式', tags:['週末可參加','非吸菸者','喜愛寵物','有台灣居住經驗'] },
+        { cat:'🗣️ 語言', tags:['中文OK','英語OK','熟悉台灣文化'] },
+        { cat:'👤 個人背景・生活', tags:['有子女','無子女','已婚','未婚','大學以上學歷','喜愛貓咪','喜愛烹飪','喜愛旅行'] },
+      ],
     },
   },
 };
@@ -574,6 +750,9 @@ function setLang(l) {
     'sl1':'sl1','sl2':'sl2','sl3':'sl3',
     'p1t':'p1t','p1s':'p1s','p1r':'p1r','p2t':'p2t','p2s':'p2s','p2r':'p2r',
     'p3t':'p3t','p3s':'p3s','p3r':'p3r','p4t':'p4t','p4s':'p4s','p4r':'p4r',
+    'p5t':'p5t','p5s':'p5s','p5r':'p5r','p6t':'p6t','p6s':'p6s','p6r':'p6r',
+    'p7t':'p7t','p7s':'p7s','p7r':'p7r','p8t':'p8t','p8s':'p8s','p8r':'p8r',
+    'p9t':'p9t','p9s':'p9s','p9r':'p9r',
     's1next':'s1next','cl1':'cl1','cb1':'cb1','cd1':'cd1','sl-lo':'slLo','sl-hi':'slHi',
     'cl2':'cl2','cb2':'cb2','cd2':'cd2','cl3':'cl3','lo-ja':'loJa','lo-zh':'loZh','lo-en':'loEn',
     's2back':'s2back','s2next':'s2next','res-lbl':'resLbl','sort-lbl':'sortLbl',
@@ -592,12 +771,10 @@ function setLang(l) {
     if (val !== undefined) el.textContent = val;
   });
 
-  // HTML elements
   const h1 = document.getElementById('h-title');
   if (h1) h1.innerHTML = t.h1;
   const tr = document.getElementById('ts-result');
   if (tr) tr.innerHTML = t.tsResult;
-
   const em = document.getElementById('cta-email');
   if (em) em.placeholder = t.ctaEmail;
 
@@ -625,8 +802,10 @@ function goStep(s) {
 // ── Purpose ───────────────────────────────────────────────
 function selectP(p) {
   purpose = p;
-  ['sports','network','biz','cofounder'].forEach(id => document.getElementById('pc-'+id).classList.toggle('sel', id===p));
-  const defaults = {sports:40, network:55, biz:70, cofounder:82};
+  ['sports','network','biz','cofounder','practice','realestate','cooking','outdoor','cats'].forEach(id =>
+    document.getElementById('pc-'+id).classList.toggle('sel', id===p)
+  );
+  const defaults = {sports:40, network:45, biz:70, cofounder:82, practice:35, realestate:50, cooking:30, outdoor:32, cats:28};
   scoreMin = defaults[p];
   const sl = document.getElementById('c-slider');
   if (sl) { sl.value = scoreMin; updateScore(scoreMin); }
@@ -639,10 +818,16 @@ function updateScore(v) {
 
 // ── Tags ──────────────────────────────────────────────────
 function renderTags() {
-  const t = T[lang], tags = t.criteriaMap[purpose] || [];
+  const t = T[lang], cats = t.criteriaMap[purpose] || [];
   const c = document.getElementById('tags-container');
-  c.innerHTML = tags.map(tag => `<div class="tag${selTags.has(tag)?' sel':''}" onclick="toggleTag(this,'${tag}')">${tag}</div>`).join('');
+  c.innerHTML = cats.map(({cat, tags}) => `
+    <div class="crit-cat-label">${cat}</div>
+    <div class="tags-row">
+      ${tags.map(tag => `<div class="tag${selTags.has(tag)?' sel':''}" onclick="toggleTag(this,'${tag}')">${tag}</div>`).join('')}
+    </div>
+  `).join('');
 }
+
 function toggleTag(el, tag) { el.classList.toggle('sel'); selTags.has(tag)?selTags.delete(tag):selTags.add(tag); }
 function toggleL(el, l) { el.classList.toggle('sel'); selLangs.has(l)?selLangs.delete(l):selLangs.add(l); }
 
@@ -709,7 +894,6 @@ function showToast(msg) {
   setTimeout(()=>el.classList.remove('show'),3200);
 }
 
-// Smooth scroll
 document.querySelectorAll('a[href^="#"]').forEach(a=>a.addEventListener('click',e=>{
   e.preventDefault(); const t=document.querySelector(a.getAttribute('href'));
   if(t) t.scrollIntoView({behavior:'smooth',block:'start'});
